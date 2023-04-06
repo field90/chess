@@ -1,72 +1,79 @@
 import 'package:flutter/material.dart';
-import 'package:chess/chess.dart' as chess;
+import 'package:flutter_chess_board/flutter_chess_board.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Chess Demo',
+      title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      home: const HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  chess.Chess _chess = chess.Chess();
-
-
-  void _resetBoard() {
-    setState(() {
-      _chess = chess.Chess();
-    });
-  }
-  void _runRandomGame() {
-    while (!_chess.game_over) {
-      print('position: ${_chess.fen}');
-      print(_chess.ascii);
-      var moves = _chess.moves();
-      moves.shuffle();
-      var move = moves[0];
-      _chess.move(move);
-      print('move: ' + move);
-    }
-  }
+class _HomePageState extends State<HomePage> {
+  ChessBoardController controller = ChessBoardController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chess Demo'),
+        title: const Text('Chess Demo'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Current FEN:',
+      body: Column(
+        children: [
+          Expanded(
+            child: Center(
+              child: ChessBoard(
+                controller: controller,
+                boardColor: BoardColor.orange,
+                arrows: [
+                  BoardArrow(
+                    from: 'd2',
+                    to: 'd4',
+                    //color: Colors.red.withOpacity(0.5),
+                  ),
+                  BoardArrow(
+                    from: 'e7',
+                    to: 'e5',
+                    color: Colors.red.withOpacity(0.7),
+                  ),
+                ],
+                boardOrientation: PlayerColor.white,
+              ),
             ),
-            Text(
-              _chess.fen,
-              style: Theme.of(context).textTheme.headline4,
+          ),
+          Expanded(
+            child: ValueListenableBuilder<Chess>(
+              valueListenable: controller,
+              builder: (context, game, _) {
+                return Text(
+                  controller.getSan().fold(
+                    '',
+                        (previousValue, element) =>
+                    previousValue + '\n' + (element ?? ''),
+                  ),
+                );
+              },
             ),
-            ElevatedButton(
-              onPressed: _runRandomGame,
-              child: const Text('Run Random Game'),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
