@@ -1,78 +1,98 @@
+import 'dart:io';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart';
+import 'package:stockfish/stockfish.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const HomePage(),
+      title: 'Stockfish Example',
+      home: ChessBoardScreen(),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
-
+class ChessBoardScreen extends StatefulWidget {
   @override
-  _HomePageState createState() => _HomePageState();
+  _ChessBoardScreenState createState() => _ChessBoardScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
-  ChessBoardController controller = ChessBoardController();
+class _ChessBoardScreenState extends State<ChessBoardScreen> {
+  late ChessBoardController _controller;
+  late Stockfish _stockfish;
+
+  String _eval = 'Evaluation: N/A';
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = ChessBoardController();
+    _initStockfish();
+  }
+
+  void _initStockfish() async {
+    _stockfish = await stockfishAsync();
+    _stockfish.stdout.listen((line) {
+
+      print("StockFish output: $line");
+      final pattern = RegExp(r'^Final evaluation\s+(\S+)\s+\(white side\)');
+      final match = pattern.firstMatch(line);
+      if (match != null) {
+        final score = match.group(1)!;
+        setState(() {
+          _eval = 'Evaluation: $score';
+        });
+      }
+    });
+  }
+
+  void _onMove() {
+    final fen = _controller.getFen();
+
+    // prep stockfish
+    _stockfish.stdin = 'isready \n';
+    _stockfish.stdin = 'go movetime 3000 \n';
+    _stockfish.stdin = 'go infinite \n';
+    _stockfish.stdin = 'stop \n';
+
+    // give it position
+    _stockfish.stdin = 'position fen $fen\n';
+    _stockfish.stdin = 'go depth 5\n';
+
+    // eval
+    _stockfish.stdin = 'eval \n';
+
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _stockfish.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chess Demo'),
+        title: Text('Chess Board'),
       ),
       body: Column(
         children: [
           Expanded(
             child: Center(
               child: ChessBoard(
-                controller: controller,
-                boardColor: BoardColor.orange,
-                arrows: [
-                  BoardArrow(
-                    from: 'd2',
-                    to: 'd4',
-                    //color: Colors.red.withOpacity(0.5),
-                  ),
-                  BoardArrow(
-                    from: 'e7',
-                    to: 'e5',
-                    color: Colors.red.withOpacity(0.7),
-                  ),
-                ],
-                boardOrientation: PlayerColor.white,
+                controller: _controller,
+                onMove: _onMove,
               ),
             ),
           ),
-          Expanded(
-            child: ValueListenableBuilder<Chess>(
-              valueListenable: controller,
-              builder: (context, game, _) {
-                return Text(
-                  controller.getSan().fold(
-                    '',
-                        (previousValue, element) =>
-                    previousValue + '\n' + (element ?? ''),
-                  ),
-                );
-              },
-            ),
-          ),
+          Text(_eval),
         ],
       ),
     );
