@@ -33,7 +33,10 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   late ChessBoardController _controller;
   late Stockfish _stockfish;
 
+  late Chess chess;
+
   String _eval = 'Evaluation: N/A';
+  int _currentMoveIndex = 0;
 
   final test_pgn = '''
  [Event "F/S Return Match"]
@@ -60,6 +63,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     super.initState();
     _controller = ChessBoardController();
 
+
     final pgn = '[Event "Casual Game"]\n'
         '[Site "Berlin GER"]\n'
         '[Date "1852.??.??"]\n'
@@ -77,7 +81,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
         '20.Bg4 Nxh4 21.Qg3 Nfg6 22.Bh5 b6 23.Bxg6 Nxg6 24.h4 h5 25.Qg5 Bb7 26.Rxd7\n'
         'Bf3 27.e6 1-0';
 
-    final chess = Chess();
+    chess = Chess();
     chess.load_pgn(pgn);
 
 
@@ -90,7 +94,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     _initStockfish();
 
     // Loop through getHistory and make each move
-
+/*
     for(int i = 0; i< chess.history.length; i++) {
      int from = chess.history[i].move.from;
      int to  = chess.history[i].move.to;
@@ -101,7 +105,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
 
      Future<void> makeMove() async {
        // Add a 3 second delay before making the move
-       await Future.delayed(Duration(seconds: 3));
 
        // Make the move
        // ...
@@ -110,7 +113,20 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
      }
      makeMove();
 
-    }
+    }*/
+  }
+  /*
+      Makes the move from a half turn and puts it on the board
+   */
+  makeMoveFromIndex(int i) {
+    int from = chess.history[i].move.from;
+    int to  = chess.history[i].move.to;
+
+    String fromSquare =  Chess.SQUARES.entries.firstWhere((entry) => entry.value == from).key; // Convert to algebraic notation
+    String toSquare =  Chess.SQUARES.entries.firstWhere((entry) => entry.value == to).key; // Convert to algebraic notation
+
+    _controller.makeMove(from: fromSquare, to: toSquare);
+
   }
 
   void _initStockfish() async {
@@ -176,7 +192,23 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
               ),
             ),
           ),
-          Text(_eval),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    makeMoveFromIndex(_currentMoveIndex);
+                    _currentMoveIndex++;
+                  });
+                },
+                child: Text('Next Move'),
+              ),
+              SizedBox(width: 20),
+              Text(_eval),
+            ],
+          ),
+
         ],
       ),
     );
