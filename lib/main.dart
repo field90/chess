@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart';
 import 'package:stockfish/stockfish.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'Stockfish Example',
       home: ChessBoardScreen(),
     );
@@ -16,6 +18,8 @@ class MyApp extends StatelessWidget {
 }
 
 class ChessBoardScreen extends StatefulWidget {
+  const ChessBoardScreen({super.key});
+
   @override
   _ChessBoardScreenState createState() => _ChessBoardScreenState();
 }
@@ -74,7 +78,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
 
     chess = Chess();
     chess.load_pgn(pgn);
-    _initStockfish();
+    _initStockFish();
 
   }
   /*
@@ -91,7 +95,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
 
   }
 
-  void _initStockfish() async {
+  void _initStockFish() async {
     _stockfish = await stockfishAsync();
     _stockfish.stdout.listen((line) {
 
@@ -107,7 +111,30 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     });
   }
 
-  void _onMove() {
+  // on user input
+  Future<void> _onMove() async {
+
+    // _controller.undoMove();
+
+
+
+
+    resetBoardWithoutLastMove();
+
+    makeMoveFromIndex(_currentMoveIndex);
+    _prepStockfish();
+
+  }
+
+  void resetBoardWithoutLastMove() {
+    List history = _controller.game.history;
+    _controller.resetBoard();
+    for (int i = 0; i < history.length - 1; i++) {
+      makeMoveFromIndex(i)  ;
+    }
+  }
+
+  void _prepStockfish() {
     final fen = _controller.getFen();
 
     // prep stockfish
@@ -156,7 +183,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
                   setState(() {
                     makeMoveFromIndex(_currentMoveIndex);
                     // maybe not perfect, but this will get stockfish going
-                    _onMove();
+                    _prepStockfish();
                     _currentMoveIndex++;
                   });
                 },
