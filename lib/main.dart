@@ -1,16 +1,7 @@
-import 'dart:io';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart';
 import 'package:stockfish/stockfish.dart';
-import 'package:chess/chess.dart' as chessLib;
-
-
-
-
-
-
 
 void main() => runApp(MyApp());
 
@@ -64,7 +55,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     _controller = ChessBoardController();
 
 
-    final pgn = '[Event "Casual Game"]\n'
+    const pgn = '[Event "Casual Game"]\n'
         '[Site "Berlin GER"]\n'
         '[Date "1852.??.??"]\n'
         '[EventDate "?"]\n'
@@ -83,37 +74,8 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
 
     chess = Chess();
     chess.load_pgn(pgn);
-
-
-    // load the pgn
-    // _controller.loadPGN(pgn);
-    // loop through the moves of the game
-
-    // Get the moves in the game
-
     _initStockfish();
 
-    // Loop through getHistory and make each move
-/*
-    for(int i = 0; i< chess.history.length; i++) {
-     int from = chess.history[i].move.from;
-     int to  = chess.history[i].move.to;
-
-     String fromSquare =  Chess.SQUARES.entries.firstWhere((entry) => entry.value == from).key; // Convert to algebraic notation
-     String toSquare =  Chess.SQUARES.entries.firstWhere((entry) => entry.value == to).key; // Convert to algebraic notation
-
-
-     Future<void> makeMove() async {
-       // Add a 3 second delay before making the move
-
-       // Make the move
-       // ...
-       _controller.makeMove(from: fromSquare, to: toSquare);
-
-     }
-     makeMove();
-
-    }*/
   }
   /*
       Makes the move from a half turn and puts it on the board
@@ -170,17 +132,11 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     super.dispose();
   }
 
-
-
-
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chess Board'),
+        title: const Text('Chess Board'),
       ),
       body: Column(
         children: [
@@ -204,9 +160,9 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
                     _currentMoveIndex++;
                   });
                 },
-                child: Text('Next Move'),
+                child: const Text('Next Move'),
               ),
-              SizedBox(width: 20),
+              const SizedBox(width: 20),
               Text(_eval),
             ],
           ),
