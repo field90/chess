@@ -199,6 +199,8 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
                 onPressed: () {
                   setState(() {
                     makeMoveFromIndex(_currentMoveIndex);
+                    // maybe not perfect, but this will get stockfish going
+                    _onMove();
                     _currentMoveIndex++;
                   });
                 },
