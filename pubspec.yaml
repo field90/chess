@@ -37,7 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   chess: ^0.7.0
   flutter_chess_board: 1.0.1
-  stock fish: ^1.2.0
+  stockfish: ^1.2.0
+
 
 
 dev_dependencies:
