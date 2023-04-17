@@ -122,6 +122,10 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     resetBoardWithoutLastMove();
 
     makeMoveFromIndex(_currentMoveIndex);
+    _currentMoveIndex++;
+    // play opponent move too
+    makeMoveFromIndex(_currentMoveIndex);
+    _currentMoveIndex++;
     _prepStockfish();
 
   }
