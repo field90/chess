@@ -27,31 +27,10 @@ class ChessBoardScreen extends StatefulWidget {
 class _ChessBoardScreenState extends State<ChessBoardScreen> {
   late ChessBoardController _controller;
   late Stockfish _stockfish;
-
   late Chess chess;
 
   String _eval = 'Evaluation: N/A';
   int _currentMoveIndex = 0;
-
-  final test_pgn = '''
- [Event "F/S Return Match"]
- [Site "Belgrade, Serbia JUG"]
- [Date "1992.11.04"]
- [Round "29"]
- [White "Fischer, Robert J."]
- [Black "Spassky, Boris V."]
- [Result "1/2-1/2"]
- 
- 1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5
- 7. Bb3 d6 8. c3 O-O 9. h3 Na5 10. Bc2 c5 11. d4 Qc7 12. Nbd2 Bd7
- 13. Nf1 Rfc8 14. Ne3 cxd4 15. cxd4 Nc6 16. d5 Nb4 17. Bb1 a5
- 18. Bd2 Na6 19. Bd3 Nc5 20. Rc1 Qb7 21. Bb1 Ncxe4 22. Rxc8+ Bxc8
- 23. Bxa5 Nxf2 24. Kxf2 Rxa5 25. Kg1 g6 26. Qd2 Ra8 27. Rd1 Bd8
- 28. Kh2 Bb6 29. Nc2 Bc5 30. b4 Bb6 31. Ne3 Bd7 32. Nf1 Ra3
- 33. Ng3 Be3 34. Qb2 Qa7 35. Rd3 Rxd3 36. Bxd3 Bf4 37. Ng1 Nh5
- 38. N1e2 Nxg3 39. Nxg3 Qe3 40. Be2 Bxg3+ 41. Kh1 Qf2 42. Qc1 Qxe2
- 43. a3 Bxh3 44. Qg1 Bf5 45. Qc1 Be4 46. Qc8+ Kg7 47. Qh3 Qf1#
-''';
 
   @override
   void initState() {
@@ -114,16 +93,20 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   // on user input
   Future<void> _onMove() async {
 
-    // _controller.undoMove();
 
-
-
+// wait for 1 second
+    await Future.delayed(const Duration(seconds: 1));
 
     resetBoardWithoutLastMove();
+// wait for 1 second
+    await Future.delayed(const Duration(seconds: 1));
+
 
     makeMoveFromIndex(_currentMoveIndex);
     _currentMoveIndex++;
     // play opponent move too
+    // wait for 1 second
+    await Future.delayed(const Duration(seconds: 1));
     makeMoveFromIndex(_currentMoveIndex);
     _currentMoveIndex++;
     _prepStockfish();
@@ -134,7 +117,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     List history = _controller.game.history;
     _controller.resetBoard();
     for (int i = 0; i < history.length - 1; i++) {
-      makeMoveFromIndex(i)  ;
+      makeMoveFromIndex(i);
     }
   }
 
@@ -167,7 +150,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chess Board'),
+        title: const Text('MichaelChess'),
       ),
       body: Column(
         children: [
