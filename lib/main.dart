@@ -99,8 +99,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
 
     resetBoardWithoutLastMove();
 // wait for 1 second
-    await Future.delayed(const Duration(seconds: 1));
-
 
     makeMoveFromIndex(_currentMoveIndex);
     _currentMoveIndex++;
