@@ -67,6 +67,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     int from = chess.history[i].move.from;
     int to  = chess.history[i].move.to;
 
+
     String fromSquare =  Chess.SQUARES.entries.firstWhere((entry) => entry.value == from).key; // Convert to algebraic notation
     String toSquare =  Chess.SQUARES.entries.firstWhere((entry) => entry.value == to).key; // Convert to algebraic notation
 
@@ -93,6 +94,18 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   // on user input
   Future<void> _onMove() async {
 
+    // Get the current state of the board
+    final gameHistory = _controller.game.history;
+
+
+// Get the last move
+    Move lastMove = gameHistory.last.move;
+
+// Convert the last move to SAN notation
+    String lastMoveNotation = chess.move_to_san(lastMove);
+
+// Print the last move notation
+    print(lastMoveNotation);
 
 // wait for 1 second
     await Future.delayed(const Duration(seconds: 1));
@@ -110,6 +123,8 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     _prepStockfish();
 
   }
+
+  void makeMoveString() {}
 
   void resetBoardWithoutLastMove() {
     List history = _controller.game.history;
@@ -159,6 +174,19 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
                 onMove: _onMove,
               ),
             ),
+          ),
+          Column(
+            children: const [
+              SizedBox(height: 16), // add some spacing between the game board and the text fields
+              Text("Your move:"),
+              TextField(),
+              SizedBox(height: 16), // add some spacing between the text fields
+              Text("Master's move:"),
+              TextField(),
+              SizedBox(height: 16), // add some spacing between the text fields
+              Text("Opponent's move:"),
+              TextField(),
+            ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
