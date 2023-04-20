@@ -32,6 +32,8 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   String _eval = 'Evaluation: N/A';
   int _currentMoveIndex = 0;
 
+  String lastMoveNotation = "";
+
   @override
   void initState() {
     super.initState();
@@ -67,7 +69,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     int from = chess.history[i].move.from;
     int to  = chess.history[i].move.to;
 
-
     String fromSquare =  Chess.SQUARES.entries.firstWhere((entry) => entry.value == from).key; // Convert to algebraic notation
     String toSquare =  Chess.SQUARES.entries.firstWhere((entry) => entry.value == to).key; // Convert to algebraic notation
 
@@ -102,10 +103,10 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     Move lastMove = gameHistory.last.move;
 
 // Convert the last move to SAN notation
-    String lastMoveNotation = chess.move_to_san(lastMove);
+    lastMoveNotation =  Chess().move_to_san(lastMove);
 
 // Print the last move notation
-    print(lastMoveNotation);
+     print(lastMoveNotation);
 
 // wait for 1 second
     await Future.delayed(const Duration(seconds: 1));
@@ -176,14 +177,14 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
             ),
           ),
           Column(
-            children: const [
-              SizedBox(height: 16), // add some spacing between the game board and the text fields
-              Text("Your move:"),
-              TextField(),
-              SizedBox(height: 16), // add some spacing between the text fields
-              Text("Master's move:"),
-              TextField(),
-              SizedBox(height: 16), // add some spacing between the text fields
+            children: [
+              const SizedBox(height: 16), // add some spacing between the game board and the text fields
+              Text("Your move: $lastMoveNotation"),
+              const TextField(),
+              const SizedBox(height: 16), // add some spacing between the text fields
+              const Text("Master's move:"),
+              const TextField(),
+              const SizedBox(height: 16), // add some spacing between the text fields
               Text("Opponent's move:"),
               TextField(),
             ],
