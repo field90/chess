@@ -1,17 +1,18 @@
 
 import 'package:flutter/material.dart';
-import 'package:michael_chess/screens/ChessBoard.dart';
+import 'package:michael_chess/screens/ChessBoardScreen.dart';
+import 'package:michael_chess/screens/MenuScreen.dart';
 
-void main() => runApp(const MyApp());
+void main() => runApp(const MichaelChess());
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MichaelChess extends StatelessWidget {
+  const MichaelChess({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      title: 'Stockfish Example',
-      home: ChessBoardScreen(),
+      title: 'Michael Chess',
+      home: MenuScreen(),
     );
   }
 }

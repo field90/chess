@@ -3,7 +3,10 @@ import 'package:flutter_chess_board/flutter_chess_board.dart';
 import 'package:stockfish/stockfish.dart';
 
 class ChessBoardScreen extends StatefulWidget {
-  const ChessBoardScreen({super.key});
+  final String pgnString;
+
+  const ChessBoardScreen({super.key, required this.pgnString});
+ 
 
   @override
   _ChessBoardScreenState createState() => _ChessBoardScreenState();
@@ -13,39 +16,36 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   late ChessBoardController _controller;
   late Stockfish _stockfish;
   late Chess chess;
-
+  late Chess otherchess;
+  late List<String> moves;
   String _eval = 'Evaluation: N/A';
   int _currentMoveIndex = 0;
+  int _currentTurnIndex = 0;
 
   String lastMoveNotation = "";
   String masterMoveNotation = "";
   String opponentMoveNotation = "";
 
+
+
   @override
   void initState() {
     super.initState();
+    final pgnString = widget.pgnString;
+    final moveText = pgnString.replaceAll(RegExp(r'\[.*\]\s*'), '');
+
+    // Parse the PGN into moves
+    // Filter out empty strings
+    moves = moveText
+        .replaceAll('\n', ' ')
+        .split(RegExp(r'\d+\.'))
+        .where((move) => move.isNotEmpty)
+        .toList();
     _controller = ChessBoardController();
-
-
-    const pgn = '[Event "Casual Game"]\n'
-        '[Site "Berlin GER"]\n'
-        '[Date "1852.??.??"]\n'
-        '[EventDate "?"]\n'
-        '[Round "?"]\n'
-        '[Result "1-0"]\n'
-        '[White "Adolf Anderssen"]\n'
-        '[Black "Jean Dufresne"]\n'
-        '[ECO "C52"]\n'
-        '[PlyCount "47"]\n'
-        '\n'
-        '1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4 Bxb4 5.c3 Ba5 6.d4 exd4 7.O-O\n'
-        'dxc3 8.Qb3 Qf6 9.e5 Qg6 10.Nxc3 Nge7 11.Ba3 O-O 12.Rad1 Bxc3 13.Qxc3\n'
-        'Re8 14.Rfe1 Nd8 15.Nh4 Qh5 16.g3 Ne6 17.f4 Nf5 18.Be2 Qxh4 19.gxh4 Nxf4\n'
-        '20.Bg4 Nxh4 21.Qg3 Nfg6 22.Bh5 b6 23.Bxg6 Nxg6 24.h4 h5 25.Qg5 Bb7 26.Rxd7\n'
-        'Bf3 27.e6 1-0';
-
     chess = Chess();
-    chess.load_pgn(pgn);
+    chess.load_pgn(pgnString);
+
+    otherchess = Chess();
     _initStockFish();
   }
 
@@ -80,7 +80,19 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
       }
     });
   }
+  String getMoveFromPGN(int moveIndex, String color) {
+    // Remove metadata at start of PGN
 
+    final move = moves[moveIndex].trim().split(' ');
+
+    if (color == 'white') {
+      return move[0];
+    } else if (color == 'black') {
+      return move[1];
+    } else {
+      return move[0];
+    }
+  }
   // on user input
   Future<void> _onMove() async {
     // Get the current state of the board
@@ -91,7 +103,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     Move lastMove = gameHistory.last.move;
 
 // Convert the last move to SAN notation
-    lastMoveNotation = Chess().move_to_san(lastMove);
+    lastMoveNotation = otherchess.move_to_san(lastMove);
 
 // Print the last move notation
     print(lastMoveNotation);
@@ -102,17 +114,18 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     resetBoardWithoutLastMove();
 // wait for 1 second
 
-    Move masterMove = chess.history[_currentMoveIndex].move;
-    masterMoveNotation = Chess().move_to_san(masterMove);
+    masterMoveNotation = getMoveFromPGN(_currentTurnIndex, 'white');
+    opponentMoveNotation = getMoveFromPGN(_currentTurnIndex, 'black');
+
     makeMoveFromIndex(_currentMoveIndex);
     _currentMoveIndex++;
     // play opponent move too
     // wait for 1 second
     await Future.delayed(const Duration(seconds: 1));
-    Move opponentMove = chess.history[_currentMoveIndex].move;
-    opponentMoveNotation = Chess().move_to_san(opponentMove);
+
     makeMoveFromIndex(_currentMoveIndex);
     _currentMoveIndex++;
+    _currentTurnIndex++;
     _prepStockfish();
   }
 
