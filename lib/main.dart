@@ -33,6 +33,8 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   int _currentMoveIndex = 0;
 
   String lastMoveNotation = "";
+  String masterMoveNotation = "";
+  String opponentMoveNotation = "";
 
   @override
   void initState() {
@@ -114,11 +116,15 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     resetBoardWithoutLastMove();
 // wait for 1 second
 
+     Move masterMove = chess.history[_currentMoveIndex].move;
+     masterMoveNotation = Chess().move_to_san(masterMove);
     makeMoveFromIndex(_currentMoveIndex);
     _currentMoveIndex++;
     // play opponent move too
     // wait for 1 second
     await Future.delayed(const Duration(seconds: 1));
+    Move opponentMove = chess.history[_currentMoveIndex].move;
+    opponentMoveNotation = Chess().move_to_san(opponentMove);
     makeMoveFromIndex(_currentMoveIndex);
     _currentMoveIndex++;
     _prepStockfish();
@@ -179,16 +185,71 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
           Column(
             children: [
               const SizedBox(height: 16), // add some spacing between the game board and the text fields
-              Text("Your move: $lastMoveNotation"),
-              const TextField(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    "Your move: $lastMoveNotation",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 200,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 16), // add some spacing between the text fields
-              const Text("Master's move:"),
-              const TextField(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    "Master's move: $masterMoveNotation",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 200,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 16), // add some spacing between the text fields
-              Text("Opponent's move:"),
-              TextField(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children:  [
+                  Text(
+                    "Opponent's move: $opponentMoveNotation",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                 const SizedBox(
+                    width: 200,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -201,7 +262,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
                     _currentMoveIndex++;
                   });
                 },
-                child: const Text('Next Move'),
+                child: const Text('Skip'),
               ),
               const SizedBox(width: 20),
               Text(_eval),
