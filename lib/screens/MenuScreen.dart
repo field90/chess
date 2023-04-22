@@ -11,34 +11,63 @@ class Game {
   Game({required this.title, required this.pgn});
 }
 
-Future<List<Game>> loadGames() async {
-  final List<Game> games = [];
+Future<Map<String, List<Game>>> loadGames() async {
+  final Map<String, List<Game>> gameCategories = {};
 
   try {
     final yamlData = await rootBundle.loadString('assets/games.yaml');
     final gamesData = loadYaml(yamlData) as YamlMap;
-    final List<dynamic> gamesList = gamesData['Classical Games'];
 
+    for (final category in gamesData.keys) {
+      final List<dynamic> gamesList = gamesData[category];
+      final List<Game> games = [];
 
+      for (final gameData in gamesList) {
+        games.add(Game(
+          title: gameData['title'],
+          pgn: gameData['pgn'],
+        ));
+      }
 
-    for (final gameData in gamesList) {
-      games.add(Game(
-        title: gameData['title'],
-        pgn: gameData['pgn'],
-      ));
+      gameCategories[category] = games;
     }
-  }catch(e){
+  } catch (e) {
     print("exception: $e");
   }
 
+  return gameCategories;
+}
 
+class CategoryScreen extends StatelessWidget {
+  final List<Game> games;
+  final String category;
 
-  return games;
+  CategoryScreen({required this.games, required this.category});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(category),
+      ),
+      body: ListView(
+        children: games.map((game) => ListTile(
+          title: Text(game.title),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChessBoardScreen(pgnString: game.pgn),
+              ),
+            );
+          },
+        )).toList(),
+      ),
+    );
+  }
 }
 
 class MenuScreen extends StatelessWidget {
-
-
   const MenuScreen({Key? key}) : super(key: key);
 
   @override
@@ -47,25 +76,24 @@ class MenuScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Select a chess game'),
       ),
-      body: FutureBuilder<List<Game>>(
+      body: FutureBuilder<Map<String, List<Game>>>(
         future: loadGames(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            final List<Game> games = snapshot.data!;
+            final Map<String, List<Game>> gameCategories = snapshot.data!;
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: games.map((game) => ElevatedButton(
+                children: gameCategories.keys.map((category) => ElevatedButton(
                   onPressed: () {
-                    // Navigate to the chess game
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ChessBoardScreen(pgnString: game.pgn),
+                        builder: (context) => CategoryScreen(games: gameCategories[category]!, category: category),
                       ),
                     );
                   },
-                  child: Text(game.title),
+                  child: Text(category),
                 )).toList(),
               ),
             );
@@ -78,6 +106,4 @@ class MenuScreen extends StatelessWidget {
       ),
     );
   }
-
-
 }
