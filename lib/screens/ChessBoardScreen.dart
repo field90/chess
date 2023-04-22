@@ -6,7 +6,6 @@ class ChessBoardScreen extends StatefulWidget {
   final String pgnString;
 
   const ChessBoardScreen({super.key, required this.pgnString});
- 
 
   @override
   _ChessBoardScreenState createState() => _ChessBoardScreenState();
@@ -25,8 +24,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   String lastMoveNotation = "";
   String masterMoveNotation = "";
   String opponentMoveNotation = "";
-
-
 
   @override
   void initState() {
@@ -80,6 +77,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
       }
     });
   }
+
   String getMoveFromPGN(int moveIndex, String color) {
     // Remove metadata at start of PGN
 
@@ -93,19 +91,32 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
       return move[0];
     }
   }
+
+  String move_to_san(Move move) {
+    // Create a copy of the current board state
+    var boardCopy = Chess.fromFEN(_controller.getFen());
+
+    // Make the move on the copied board
+    boardCopy.move(move);
+
+    // Calculate the SAN notation based on the state of the copied board
+    var moves = boardCopy.moves();
+    var moveText = move.toString();
+    for (var i = 0; i < moves.length; i++) {
+      if (moves[i].toString() == moveText) {
+        return boardCopy.move_to_san(moves[i]);
+      }
+    }
+
+    // If we didn't find a matching move, return an empty string
+    return "";
+  }
+
   // on user input
   Future<void> _onMove() async {
     // Get the current state of the board
-    final gameHistory = _controller.game.history;
-
-
-// Get the last move
-    Move lastMove = gameHistory.last.move;
-
-// Convert the last move to SAN notation
-    lastMoveNotation = otherchess.move_to_san(lastMove);
-
-// Print the last move notation
+    lastMoveNotation = _controller.getSan().last!;
+    // Print the last move notation
     print(lastMoveNotation);
 
 // wait for 1 second
@@ -155,6 +166,20 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     // eval
     _stockfish.stdin = 'eval \n';
   }
+
+/*
+  double _scoreMove() {
+    final fen = _controller.getFen();
+    _stockfish.stdin = 'position fen $fen\n';
+    _stockfish.stdin = 'go depth 5\n';
+    // final score = _stockfish.getScore();
+
+    // Normalize the score to a range of -10 to 10
+    final normalizedScore = score / 100;
+    final scoreOutOfTen = (normalizedScore + 1) * 5;
+    return scoreOutOfTen;
+  }
+*/
 
   @override
   void dispose() {
@@ -249,7 +274,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
               ),
             ],
           ),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -268,7 +292,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
               Text(_eval),
             ],
           ),
-
         ],
       ),
     );
