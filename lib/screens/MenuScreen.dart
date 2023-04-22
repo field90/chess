@@ -57,7 +57,7 @@ class CategoryScreen extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ChessBoardScreen(pgnString: game.pgn),
+                builder: (context) => ChessBoardScreen(titleString: game.title, pgnString: game.pgn),
               ),
             );
           },

@@ -3,9 +3,10 @@ import 'package:flutter_chess_board/flutter_chess_board.dart';
 import 'package:stockfish/stockfish.dart';
 
 class ChessBoardScreen extends StatefulWidget {
+  final String titleString;
   final String pgnString;
 
-  const ChessBoardScreen({super.key, required this.pgnString});
+  const ChessBoardScreen({super.key, required this.titleString, required this.pgnString});
 
   @override
   _ChessBoardScreenState createState() => _ChessBoardScreenState();
@@ -25,10 +26,13 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   String masterMoveNotation = "";
   String opponentMoveNotation = "";
 
+  String titleString = "";
+
   @override
   void initState() {
     super.initState();
     final pgnString = widget.pgnString;
+    titleString = widget.titleString;
     final moveText = pgnString.replaceAll(RegExp(r'\[.*\]\s*'), '');
 
     // Parse the PGN into moves
@@ -196,6 +200,10 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
       ),
       body: Column(
         children: [
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Text('$titleString', style: TextStyle(fontSize: 24)),
+          ),
           Expanded(
             child: Center(
               child: ChessBoard(
@@ -217,15 +225,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
-                  ),
-                  const SizedBox(
-                    width: 200,
-                    child: TextField(
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
+                  )
                 ],
               ),
               const SizedBox(height: 16),
@@ -239,15 +239,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
-                  ),
-                  const SizedBox(
-                    width: 200,
-                    child: TextField(
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
+                  )
                 ],
               ),
               const SizedBox(height: 16),
@@ -261,15 +253,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
-                  ),
-                  const SizedBox(
-                    width: 200,
-                    child: TextField(
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
+                  )
                 ],
               ),
             ],
