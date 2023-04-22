@@ -37,10 +37,10 @@ packages:
     dependency: transitive
     description:
       name: chess_vectors_flutter
-      sha256: "988ff9ec3fa00174f0c0bbe0d50ca776803d9c8fff84d326876ee8a2e11dce31"
+      sha256: eebcb4fbd1ab105fe842d8415bad66ad222db9db3b5b743b348bbecad51b4d3a
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.18"
+    version: "1.0.12"
   clock:
     dependency: transitive
     description:
@@ -155,6 +155,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.8.2"
+  quiver:
+    dependency: transitive
+    description:
+      name: quiver
+      sha256: e83f7ad1e6375da1400b54eea8793bba804d1731d68c5694490bf9296cd3ca24
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.5"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -217,13 +225,13 @@ packages:
     source: hosted
     version: "0.4.16"
   tuple:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: tuple
-      sha256: "0ea99cd2f9352b2586583ab2ce6489d1f95a5f6de6fb9492faaf97ae2060f0aa"
+      sha256: "2b6a02e9d42cde3e088c10961537684a85193b20c320b1def7c46d383458b450"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.1"
+    version: "1.0.3"
   vector_math:
     dependency: transitive
     description:

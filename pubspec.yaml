@@ -38,6 +38,8 @@ dependencies:
   flutter_chess_board: 1.0.1
   stockfish: ^1.2.0
   yaml: ^3.0.0
+  tuple: ^1.0.3
+
 
 
 
