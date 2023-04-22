@@ -1,0 +1,22 @@
+Classical Games:
+  - title: "Anderssen vs. Dufresne, Berlin 1852"
+    pgn: |
+      [Event "Casual Game"]
+      [Site "Berlin GER"]
+      [Date "1852.??.??"]
+      [EventDate "?"]
+      [Round "?"]
+      [Result "1-0"]
+
+      1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4 Bxb4 5.c3 Ba5 6.d4 exd4 7.O-O dxc3 8.Qb3 Qf6 9.e5 Qg6 10.Nxc3 Nge7 11.Ba3 O-O 12.Rad1 Bxc3 13.Qxc3 Re8 14.Rfe1 Nd8 15.Nh4 Qh5 16.g3 Ne6 17.f4 Nf5 18.Be2 Qxh4 19.gxh4 Nxf4 20.Bg4 Nxh4 21.Qg3 Nfg6 22.Bh5 b6 23.Bxg6 Nxg6 24.h4 h5 25.Qg5 Bb7 26.Rxd7 Bf3 27.e6 1-0
+
+  - title: "Paul Morphy vs. Duke Karl / Count Isouard, Paris Opera 1858"
+    pgn: |
+      [Event "Casual Game"]
+      [Site "Paris FRA"]
+      [Date "1858.??.??"]
+      [EventDate "?"]
+      [Round "?"]
+      [Result "1-0"]
+
+      1.e4 e5 2.Nf3 d6 3.d4 Bg4 4.dxe5 Bxf3 5.Qxf3 dxe5 6.Bc4 Nf6 7.Qb3 Qe7 8.Nc3 c6 9.Bg5 b5 10.Nxb5 cxb5 11.Bxb5+ Nbd7 12.O-O-O Rd8 13.Rxd7 Rxd7 14.Rd1 Qe6 15.Bxd7+ Nxd7 16.Qb8+ Nxb8 17.Rd8# 1-0
