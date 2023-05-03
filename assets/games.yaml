@@ -548,3 +548,23 @@ Spassky Fischer:
       36. Be6 Kf4 37. Bd7 Rb1 38. Be6 Rb2 39. Bc4 Ra2 40. Be6 h5
       41. Bd7 0-1
       
+
+Mason's Games:
+  - title: "Lasker Alekhine"
+    pgn: |
+      [Event "St Petersburg International Final"]
+      [Site "St Petersburg"]  
+      [Date "1914.05.10"]
+      [Round "1"]
+      [White "Lasker, Emanuel"]
+      [Black "Alekhine, Alexander"]
+      [Result "1-0"]
+      [UTCDate "2023.04.20"]
+      [UTCTime "12:54:49"]
+      [Variant "Standard"]
+      [ECO "D08"]
+      [Opening "Queen's Gambit Declined: Albin Countergambit, Normal Line"]
+      [Annotator "https://lichess.org/@/cantosh"]
+
+      1. d4 d5 2. c4 e5 3. dxe5 d4 4. Nf3 Nc6 5. a3 Bg4 6. Nbd2 Qe7 7. h3 Bxf3 8. Nxf3 O-O-O 9. Qd3 h6 10. g3 g6 11. Bg2 Bg7 12. O-O Nxe5 13. Nxe5 Bxe5 14. b4 f5 15. c5 Qe6 16. c6 Ne7 17. cxb7+ Kb8 18. Bb2 Rd6 19. Rac1 Rhd8 20. Rc2 f4 21. gxf4 Bxf4 22. Rd1 Nf5 23. Bc1 Ne3 24. Rc5 Qf6 25. Qe4 Nxd1 26. Bxf4 Nc3 27. Bxd6 Qxd6 28. Qe5 Qb6 29. Qe7 Qd6 30. Re5 d3 31. exd3 Qxd3 32. Re3 Qd1+ 33. Kh2 Nb5 34. Re6 Nxa3 35. Rf6 { 1-0 White wins. } 1-0
+

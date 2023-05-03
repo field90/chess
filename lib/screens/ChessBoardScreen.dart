@@ -1,12 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart';
 import 'package:stockfish/stockfish.dart';
+import 'dart:isolate';
+
 
 class ChessBoardScreen extends StatefulWidget {
   final String titleString;
   final String pgnString;
 
-  const ChessBoardScreen({super.key, required this.titleString, required this.pgnString});
+  const ChessBoardScreen(
+      {super.key, required this.titleString, required this.pgnString});
 
   @override
   _ChessBoardScreenState createState() => _ChessBoardScreenState();
@@ -16,7 +21,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   late ChessBoardController _controller;
   late Stockfish _stockfish;
   late Chess chess;
-  late Chess otherchess;
   late List<String> moves;
   String _eval = 'Evaluation: N/A';
   int _currentMoveIndex = 0;
@@ -25,8 +29,14 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   String lastMoveNotation = "";
   String masterMoveNotation = "";
   String opponentMoveNotation = "";
+  String bestMoveNotation = "";
 
   String titleString = "";
+  String _bestMove = "";
+
+  late Future<List<Object>> masterTuple;
+
+  late Future<List<Object>> humanMove;
 
   @override
   void initState() {
@@ -45,9 +55,11 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     _controller = ChessBoardController();
     chess = Chess();
     chess.load_pgn(pgnString);
-
-    otherchess = Chess();
     _initStockFish();
+
+    // start the process of calcuating the next move.
+
+    // _prepStockfish();
   }
 
   /*
@@ -80,6 +92,51 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
         });
       }
     });
+  }
+
+  Future<String> getBestMove(String fen, int depth) async {
+    _stockfish.stdin = 'position fen $fen\n';
+    _stockfish.stdin = 'go depth $depth\n';
+    final completer = Completer<String>();
+    var buffer = StringBuffer();
+
+    StreamSubscription? subscription;
+    subscription = _stockfish.stdout.listen((data) {
+      buffer.write(data);
+      if (buffer.toString().contains('bestmove')) {
+        subscription?.cancel();
+        final moveLine = buffer.toString().trim().split('\n').last;
+        final move = moveLine.split(' ').last;
+        completer.complete(move);
+      }
+    });
+
+    return completer.future;
+  }
+
+  Future<int> getEvaluation(String fen, int depth) async {
+    _stockfish.stdin = 'position fen $fen\n';
+    _stockfish.stdin = 'go depth $depth\n';
+    final completer = Completer<int>();
+    var buffer = StringBuffer();
+
+    StreamSubscription? subscription;
+    subscription = _stockfish.stdout.listen((data) {
+      buffer.write(data);
+      if (buffer.toString().contains('score')) {
+        subscription?.cancel();
+        final scoreLine = buffer.toString().trim().split('\n').last;
+        int cpIndex = scoreLine.indexOf("score cp");
+        String cpString = scoreLine.substring(cpIndex + 8).trimLeft();
+        int spaceIndex = cpString.indexOf(" ");
+        int cp = int.parse(cpString.substring(0, spaceIndex));
+
+        final score = cp;
+        completer.complete(score);
+      }
+    });
+
+    return completer.future;
   }
 
   String getMoveFromPGN(int moveIndex, String color) {
@@ -116,9 +173,30 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     return "";
   }
 
+
+  // Define a function to be run in the isolate
+  Future<List<dynamic>> computeEvaluations(List<dynamic> args) async {
+    // Perform the evaluations
+    final computerEvaluationFuture = getBestMoveAndEvaluation();
+    final userEvaluationFuture = getEvaluation(args[0], args[1]);
+
+    // Wait for both futures to complete
+    final results = await Future.wait([computerEvaluationFuture, userEvaluationFuture]);
+
+    // Return the results as a list
+    return results;
+  }
   // on user input
   Future<void> _onMove() async {
-    // Get the current state of the board
+    // Get the cp after the move was played.
+    final computerEvaluationFuture = getBestMoveAndEvaluation();
+
+
+
+    // once both these evaluations are done, we can move on
+    // so let's await the result of both of these
+
+    // Listen for the completion of the future
     lastMoveNotation = _controller.getSan().last!;
     // Print the last move notation
     print(lastMoveNotation);
@@ -127,13 +205,23 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     await Future.delayed(const Duration(seconds: 1));
 
     resetBoardWithoutLastMove();
-// wait for 1 second
-
+    // wait for 1 second
     masterMoveNotation = getMoveFromPGN(_currentTurnIndex, 'white');
     opponentMoveNotation = getMoveFromPGN(_currentTurnIndex, 'black');
 
+    // master move
     makeMoveFromIndex(_currentMoveIndex);
     _currentMoveIndex++;
+
+    // ok request the evaluation here
+    final userEvaluationFuture = getEvaluation(_controller.getFen(), 15);
+
+    // Wait for both futures to complete
+    final results = await Future.wait([computerEvaluationFuture, userEvaluationFuture]);
+    // Extract the results of the two tasks
+    final masterEvaluation = results[0];
+    final evaluationResult = results[1];
+
     // play opponent move too
     // wait for 1 second
     await Future.delayed(const Duration(seconds: 1));
@@ -154,6 +242,22 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     }
   }
 
+  Future<List<Object>> getBestMoveAndEvaluation() async {
+    final previousFen = _controller.getFen(); // Store previous FEN string
+    final bestMove = await getBestMove(previousFen, 15);
+    _controller.makeMoveWithNormalNotation(
+        bestMove); // Update FEN string with best move
+
+    final evaluation = await getEvaluation(_controller.getFen(), 15);
+
+    print("Best move: $bestMove");
+    print("Evaluation: $evaluation");
+
+    _controller.loadFen(previousFen); // Restore previous FEN string
+
+    return [bestMove, evaluation];
+  }
+
   void _prepStockfish() {
     final fen = _controller.getFen();
 
@@ -165,7 +269,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
 
     // give it position
     _stockfish.stdin = 'position fen $fen\n';
-    _stockfish.stdin = 'go depth 5\n';
+    _stockfish.stdin = 'go depth 15\n';
 
     // eval
     _stockfish.stdin = 'eval \n';
@@ -190,6 +294,22 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     _controller.dispose();
     _stockfish.dispose();
     super.dispose();
+  }
+
+  void populateTheMasterEvaluation() {
+    try {
+      masterTuple = getBestMoveAndEvaluation();
+      // Listen for the completion of the future
+      masterTuple.then((List<Object> result) {
+        // Do something with the result, e.g. call another function
+        //Calculate the difference in CP
+        print("The master Move's centerpawn, at least the first one $result");
+      });
+      // Rest of your code here...
+    } catch (e) {
+      // Handle any errors that may have occurred...
+      print(e);
+    }
   }
 
   @override
