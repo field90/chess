@@ -32,11 +32,17 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   String bestMoveNotation = "";
 
   String titleString = "";
-  String _bestMove = "";
 
   late Future<List<Object>> masterTuple;
 
   late Future<List<Object>> humanMove;
+
+  // Define two state variables to hold the evaluations
+  int? _bestMoveEvaluation;
+  int? _userMoveEvaluation;
+  String? _bestMove;
+
+  String? _fenWithYourMove;
 
   @override
   void initState() {
@@ -53,6 +59,9 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
         .where((move) => move.isNotEmpty)
         .toList();
     _controller = ChessBoardController();
+    // get the fen
+
+    _fenWithYourMove = _controller.getFen();
     chess = Chess();
     chess.load_pgn(pgnString);
     _initStockFish();
@@ -173,38 +182,22 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     return "";
   }
 
-
-  // Define a function to be run in the isolate
-  Future<List<dynamic>> computeEvaluations(List<dynamic> args) async {
-    // Perform the evaluations
-    final computerEvaluationFuture = getBestMoveAndEvaluation();
-    final userEvaluationFuture = getEvaluation(args[0], args[1]);
-
-    // Wait for both futures to complete
-    final results = await Future.wait([computerEvaluationFuture, userEvaluationFuture]);
-
-    // Return the results as a list
-    return results;
-  }
   // on user input
   Future<void> _onMove() async {
-    // Get the cp after the move was played.
-    final computerEvaluationFuture = getBestMoveAndEvaluation();
 
-
-
-    // once both these evaluations are done, we can move on
-    // so let's await the result of both of these
-
+    _fenWithYourMove = _controller.getFen();
     // Listen for the completion of the future
     lastMoveNotation = _controller.getSan().last!;
     // Print the last move notation
     print(lastMoveNotation);
 
-// wait for 1 second
+    // wait for 1 second
     await Future.delayed(const Duration(seconds: 1));
 
     resetBoardWithoutLastMove();
+    // Get the cp after the move was played.
+    final computerEvaluationFuture = getBestMoveAndEvaluation(_controller.getFen());
+
     // wait for 1 second
     masterMoveNotation = getMoveFromPGN(_currentTurnIndex, 'white');
     opponentMoveNotation = getMoveFromPGN(_currentTurnIndex, 'black');
@@ -213,14 +206,10 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     makeMoveFromIndex(_currentMoveIndex);
     _currentMoveIndex++;
 
+    await Future.delayed(const Duration(seconds: 15));
+
     // ok request the evaluation here
     final userEvaluationFuture = getEvaluation(_controller.getFen(), 15);
-
-    // Wait for both futures to complete
-    final results = await Future.wait([computerEvaluationFuture, userEvaluationFuture]);
-    // Extract the results of the two tasks
-    final masterEvaluation = results[0];
-    final evaluationResult = results[1];
 
     // play opponent move too
     // wait for 1 second
@@ -230,6 +219,26 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     _currentMoveIndex++;
     _currentTurnIndex++;
     _prepStockfish();
+
+    // Wait for both futures to complete concurrently
+    final results = await Future.wait([computerEvaluationFuture, userEvaluationFuture]);
+
+    // Extract the results of the two tasks
+    // Extract the results of the two tasks
+    final bestMove = (results[0] as List<dynamic>)[0];
+    final bestMoveEvaluation = (results[0] as List<dynamic>)[1];
+    final userMoveEvaluation = results[1];
+
+    // Update the state of your widget with the new evaluation results
+    setState(() {
+      _bestMove = bestMove as String?;
+      _bestMoveEvaluation = bestMoveEvaluation as int?;
+      _userMoveEvaluation = userMoveEvaluation as int?;
+    });
+
+    // Do something with the results, e.g. print them
+    print("Best Move Evaluation: $bestMoveEvaluation");
+    print("User Move Evaluation: $userMoveEvaluation");
   }
 
   void makeMoveString() {}
@@ -241,19 +250,60 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
       makeMoveFromIndex(i);
     }
   }
+  Future<List<Object>> evalResult(String fen, int depth) async {
+    _stockfish.stdin = 'eval $fen\n';
+    _stockfish.stdin = 'go depth $depth\n';
+    final completer = Completer<List<Object>>();
+    var buffer = StringBuffer();
 
-  Future<List<Object>> getBestMoveAndEvaluation() async {
-    final previousFen = _controller.getFen(); // Store previous FEN string
-    final bestMove = await getBestMove(previousFen, 15);
-    _controller.makeMoveWithNormalNotation(
-        bestMove); // Update FEN string with best move
+    StreamSubscription? subscription;
+    subscription = _stockfish.stdout.listen((data) {
+      buffer.write(data);
+      if (buffer.toString().contains('bestmove')) {
+        final bestMove = data.split(' ')[1];
+        final scoreLine = buffer.toString().trim().split('\n').last;
+        int cpIndex = scoreLine.indexOf("score cp");
+        String cpString = scoreLine.substring(cpIndex + 8).trimLeft();
+        int spaceIndex = cpString.indexOf(" ");
+        int cp = int.parse(cpString.substring(0, spaceIndex));
 
-    final evaluation = await getEvaluation(_controller.getFen(), 15);
+        final score = cp;
+
+        subscription?.cancel();
+        completer.complete([bestMove, score]);
+      }
+    });
+
+    _stockfish.stdin = 'position fen $fen';
+    _stockfish.stdin  = 'go depth $depth';
+
+    return completer.future;
+  }
+
+  String extractBestMove(String output) {
+    final index = output.indexOf('bestmove') + 9;
+    final endIndex = output.indexOf(' ', index);
+    final bestMove = output.substring(index, endIndex);
+    return bestMove;
+  }
+
+  int extractEvaluation(String output) {
+    final scoreLine = output.trim().split('\n').last;
+    final cpIndex = scoreLine.indexOf('score cp');
+    final cpString = scoreLine.substring(cpIndex + 8).trimLeft();
+    final spaceIndex = cpString.indexOf(' ');
+    final cp = int.parse(cpString.substring(0, spaceIndex));
+    return cp;
+  }
+
+
+  Future<List<Object>> getBestMoveAndEvaluation(String fen) async {
+    final evalResulted = await evalResult(fen, 15);
+    final bestMove = evalResulted[0] as String;
+    final evaluation = evalResulted[1] as int;
 
     print("Best move: $bestMove");
     print("Evaluation: $evaluation");
-
-    _controller.loadFen(previousFen); // Restore previous FEN string
 
     return [bestMove, evaluation];
   }
@@ -294,22 +344,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     _controller.dispose();
     _stockfish.dispose();
     super.dispose();
-  }
-
-  void populateTheMasterEvaluation() {
-    try {
-      masterTuple = getBestMoveAndEvaluation();
-      // Listen for the completion of the future
-      masterTuple.then((List<Object> result) {
-        // Do something with the result, e.g. call another function
-        //Calculate the difference in CP
-        print("The master Move's centerpawn, at least the first one $result");
-      });
-      // Rest of your code here...
-    } catch (e) {
-      // Handle any errors that may have occurred...
-      print(e);
-    }
   }
 
   @override
@@ -376,6 +410,42 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
                   )
                 ],
               ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    "User Move Evaluation (CP): $_userMoveEvaluation",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    "Best Move Evaluation (CP): $_bestMoveEvaluation",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    "Best Move: $_bestMove",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                ],
+              )
             ],
           ),
           Row(
