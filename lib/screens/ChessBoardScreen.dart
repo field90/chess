@@ -84,66 +84,21 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
 
   void _initStockFish() async {
     _stockfish = await stockfishAsync();
+
+    // for debugging purposes only now
+    /*
     _stockfish.stdout.listen((line) {
       print("StockFish output: $line");
-     /* final pattern = RegExp(r'^Final evaluation\s+(\S+)\s+\(white side\)');
+      final pattern = RegExp(r'^Final evaluation\s+(\S+)\s+\(white side\)');
       final match = pattern.firstMatch(line);
       if (match != null) {
         final score = match.group(1)!;
         setState(() {
           _eval = 'Evaluation: $score';
         });
-      }*/
-    });
-  }
-
-  Future<String> getBestMove(String fen, int depth) async {
-    _stockfish.stdin = 'position fen $fen\n';
-    _stockfish.stdin = 'go depth $depth\n';
-    final completer = Completer<String>();
-    var buffer = StringBuffer();
-
-    StreamSubscription? subscription;
-    subscription = _stockfish.stdout.listen((data) {
-      buffer.write(data);
-      if (buffer.toString().contains('bestmove')) {
-        subscription?.cancel();
-        final moveLine = buffer.toString().trim().split('\n').last;
-        final move = moveLine.split(' ').last;
-        completer.complete(move);
       }
     });
-
-    return completer.future;
-  }
-
-  Future<int> getEvaluation(String fen, int depth, String identifier) async {
-    _stockfish.stdin = 'eval $fen id $identifier\n';
-    _stockfish.stdin = 'go depth $depth\n';
-
-    final completer = Completer<int>();
-    var buffer = StringBuffer();
-
-    StreamSubscription? subscription;
-    subscription = _stockfish.stdout.listen((data) {
-      buffer.write(data);
-      if (buffer.toString().contains('score')) {
-        final output = buffer.toString();
-        if (output.contains('id $identifier')) {
-          subscription?.cancel();
-          final scoreLine = output.trim().split('\n').last;
-          int cpIndex = scoreLine.indexOf("score cp");
-          String cpString = scoreLine.substring(cpIndex + 8).trimLeft();
-          int spaceIndex = cpString.indexOf(" ");
-          int cp = int.parse(cpString.substring(0, spaceIndex));
-
-          final score = cp;
-          completer.complete(score);
-        }
-      }
-    });
-
-    return completer.future;
+    */
   }
 
   String getMoveFromPGN(int moveIndex, String color) {
@@ -160,26 +115,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     }
   }
 
-  String move_to_san(Move move) {
-    // Create a copy of the current board state
-    var boardCopy = Chess.fromFEN(_controller.getFen());
-
-    // Make the move on the copied board
-    boardCopy.move(move);
-
-    // Calculate the SAN notation based on the state of the copied board
-    var moves = boardCopy.moves();
-    var moveText = move.toString();
-    for (var i = 0; i < moves.length; i++) {
-      if (moves[i].toString() == moveText) {
-        return boardCopy.move_to_san(moves[i]);
-      }
-    }
-
-    // If we didn't find a matching move, return an empty string
-    return "";
-  }
-
   // on user input
   Future<void> _onMove() async {
     _fenWithYourMove = _controller.getFen();
@@ -188,7 +123,8 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     // Print the last move notation
     print(lastMoveNotation);
 
-
+    // request the evaluation here
+    final userEvaluationFuture = getBestMoveAndEvaluation(_fenWithYourMove!, 15);
 
     // wait for 1 second
     await Future.delayed(const Duration(seconds: 1));
@@ -204,7 +140,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     makeMoveFromIndex(_currentMoveIndex);
     _currentMoveIndex++;
 
-
     // play opponent move too
     // wait for 1 second
     await Future.delayed(const Duration(seconds: 1));
@@ -212,19 +147,10 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     makeMoveFromIndex(_currentMoveIndex);
     _currentMoveIndex++;
     _currentTurnIndex++;
-    // _prepStockfish();
 
-    // Wait for both futures to complete concurrently
     // ok request the evaluation here
-    final userEvaluationFuture = getBestMoveAndEvaluation(_fenWithYourMove!, 15);
     final results = await userEvaluationFuture;
 
-    // final results = await userEvaluationFuture;
-
-    // Extract the results of the two tasks
-    // Extract the results of the two tasks
-    // final bestMove = (results[0] as List<dynamic>)[0];
-    // final bestMoveEvaluation = (results[0] as List<dynamic>)[1];
     final bestMoveBlack = results[0];
     final userMoveEvaluation = results[1];
 
@@ -276,29 +202,10 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
       }
     });
 
-
-
-
     _stockfish.stdin = 'position fen $fen';
     _stockfish.stdin = 'go depth $depth';
 
     return completer.future;
-  }
-
-  String extractBestMove(String output) {
-    final index = output.indexOf('bestmove') + 9;
-    final endIndex = output.indexOf(' ', index);
-    final bestMove = output.substring(index, endIndex);
-    return bestMove;
-  }
-
-  int extractEvaluation(String output) {
-    final scoreLine = output.trim().split('\n').last;
-    final cpIndex = scoreLine.indexOf('score cp');
-    final cpString = scoreLine.substring(cpIndex + 8).trimLeft();
-    final spaceIndex = cpString.indexOf(' ');
-    final cp = int.parse(cpString.substring(0, spaceIndex));
-    return cp;
   }
 
   Future<List<Object>> getBestMoveAndEvaluation(String fen, int depth) async {
