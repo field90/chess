@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart';
 import 'package:stockfish/stockfish.dart';
-import 'dart:isolate';
 
 class ChessBoardScreen extends StatefulWidget {
   final String titleString;
@@ -148,12 +147,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
         getBestMoveAndEvaluation(_fenWithYourMove!, 15);
     final results = await userEvaluationFuture;
 
-    // final results = await userEvaluationFuture;
-
-    // Extract the results of the two tasks
-    // Extract the results of the two tasks
-    // final bestMove = (results[0] as List<dynamic>)[0];
-    // final bestMoveEvaluation = (results[0] as List<dynamic>)[1];
     final bestMoveBlack = results[0];
     final userMoveEvaluation = results[1];
 
@@ -203,27 +196,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
         completer.complete([bestMove, score]);
       }
     });
-
-    _stockfish.stdin = 'position fen $fen';
-    _stockfish.stdin = 'go depth $depth';
-
     return completer.future;
-  }
-
-  String extractBestMove(String output) {
-    final index = output.indexOf('bestmove') + 9;
-    final endIndex = output.indexOf(' ', index);
-    final bestMove = output.substring(index, endIndex);
-    return bestMove;
-  }
-
-  int extractEvaluation(String output) {
-    final scoreLine = output.trim().split('\n').last;
-    final cpIndex = scoreLine.indexOf('score cp');
-    final cpString = scoreLine.substring(cpIndex + 8).trimLeft();
-    final spaceIndex = cpString.indexOf(' ');
-    final cp = int.parse(cpString.substring(0, spaceIndex));
-    return cp;
   }
 
   Future<List<Object>> getBestMoveAndEvaluation(String fen, int depth) async {
@@ -238,7 +211,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   }
 
   void _prepStockfish() {
-    final fen = _controller.getFen();
 
     // prep stockfish
     // prep stockfish
@@ -248,12 +220,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     _stockfish.stdin = 'uci\n';
     _stockfish.stdin = 'stop \n';
 
-    // // give it position
-    // _stockfish.stdin = 'position fen $fen\n';
-    // _stockfish.stdin = 'go depth 15\n';
-    //
-    // // eval
-    // _stockfish.stdin = 'eval \n';
   }
 
 /*
