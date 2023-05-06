@@ -5,7 +5,6 @@ import 'package:flutter_chess_board/flutter_chess_board.dart';
 import 'package:stockfish/stockfish.dart';
 import 'dart:isolate';
 
-
 class ChessBoardScreen extends StatefulWidget {
   final String titleString;
   final String pgnString;
@@ -40,7 +39,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   // Define two state variables to hold the evaluations
   int? _bestMoveEvaluation;
   int? _userMoveEvaluation;
-  String? _bestMove;
+  String? _bestMoveBlack;
 
   String? _fenWithYourMove;
 
@@ -64,16 +63,11 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     _fenWithYourMove = _controller.getFen();
     chess = Chess();
     chess.load_pgn(pgnString);
+
     _initStockFish();
-
     // start the process of calcuating the next move.
-
-    // _prepStockfish();
   }
 
-  /*
-      Makes the move from a half turn and puts it on the board
-   */
   makeMoveFromIndex(int i) {
     int from = chess.history[i].move.from;
     int to = chess.history[i].move.to;
@@ -92,14 +86,14 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     _stockfish = await stockfishAsync();
     _stockfish.stdout.listen((line) {
       print("StockFish output: $line");
-      final pattern = RegExp(r'^Final evaluation\s+(\S+)\s+\(white side\)');
+     /* final pattern = RegExp(r'^Final evaluation\s+(\S+)\s+\(white side\)');
       final match = pattern.firstMatch(line);
       if (match != null) {
         final score = match.group(1)!;
         setState(() {
           _eval = 'Evaluation: $score';
         });
-      }
+      }*/
     });
   }
 
@@ -123,9 +117,10 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     return completer.future;
   }
 
-  Future<int> getEvaluation(String fen, int depth) async {
-    _stockfish.stdin = 'position fen $fen\n';
+  Future<int> getEvaluation(String fen, int depth, String identifier) async {
+    _stockfish.stdin = 'eval $fen id $identifier\n';
     _stockfish.stdin = 'go depth $depth\n';
+
     final completer = Completer<int>();
     var buffer = StringBuffer();
 
@@ -133,15 +128,18 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     subscription = _stockfish.stdout.listen((data) {
       buffer.write(data);
       if (buffer.toString().contains('score')) {
-        subscription?.cancel();
-        final scoreLine = buffer.toString().trim().split('\n').last;
-        int cpIndex = scoreLine.indexOf("score cp");
-        String cpString = scoreLine.substring(cpIndex + 8).trimLeft();
-        int spaceIndex = cpString.indexOf(" ");
-        int cp = int.parse(cpString.substring(0, spaceIndex));
+        final output = buffer.toString();
+        if (output.contains('id $identifier')) {
+          subscription?.cancel();
+          final scoreLine = output.trim().split('\n').last;
+          int cpIndex = scoreLine.indexOf("score cp");
+          String cpString = scoreLine.substring(cpIndex + 8).trimLeft();
+          int spaceIndex = cpString.indexOf(" ");
+          int cp = int.parse(cpString.substring(0, spaceIndex));
 
-        final score = cp;
-        completer.complete(score);
+          final score = cp;
+          completer.complete(score);
+        }
       }
     });
 
@@ -184,19 +182,19 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
 
   // on user input
   Future<void> _onMove() async {
-
     _fenWithYourMove = _controller.getFen();
     // Listen for the completion of the future
     lastMoveNotation = _controller.getSan().last!;
     // Print the last move notation
     print(lastMoveNotation);
 
+
+
     // wait for 1 second
     await Future.delayed(const Duration(seconds: 1));
 
     resetBoardWithoutLastMove();
     // Get the cp after the move was played.
-    final computerEvaluationFuture = getBestMoveAndEvaluation(_controller.getFen());
 
     // wait for 1 second
     masterMoveNotation = getMoveFromPGN(_currentTurnIndex, 'white');
@@ -206,10 +204,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     makeMoveFromIndex(_currentMoveIndex);
     _currentMoveIndex++;
 
-    await Future.delayed(const Duration(seconds: 15));
-
-    // ok request the evaluation here
-    final userEvaluationFuture = getEvaluation(_controller.getFen(), 15);
 
     // play opponent move too
     // wait for 1 second
@@ -218,27 +212,31 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     makeMoveFromIndex(_currentMoveIndex);
     _currentMoveIndex++;
     _currentTurnIndex++;
-    _prepStockfish();
+    // _prepStockfish();
 
     // Wait for both futures to complete concurrently
-    final results = await Future.wait([computerEvaluationFuture, userEvaluationFuture]);
+    // ok request the evaluation here
+    final userEvaluationFuture = getBestMoveAndEvaluation(_fenWithYourMove!, 15);
+    final results = await userEvaluationFuture;
+
+    // final results = await userEvaluationFuture;
 
     // Extract the results of the two tasks
     // Extract the results of the two tasks
-    final bestMove = (results[0] as List<dynamic>)[0];
-    final bestMoveEvaluation = (results[0] as List<dynamic>)[1];
+    // final bestMove = (results[0] as List<dynamic>)[0];
+    // final bestMoveEvaluation = (results[0] as List<dynamic>)[1];
+    final bestMoveBlack = results[0];
     final userMoveEvaluation = results[1];
 
     // Update the state of your widget with the new evaluation results
     setState(() {
-      _bestMove = bestMove as String?;
-      _bestMoveEvaluation = bestMoveEvaluation as int?;
+      _bestMoveBlack = bestMoveBlack as String?;
       _userMoveEvaluation = userMoveEvaluation as int?;
     });
-
     // Do something with the results, e.g. print them
-    print("Best Move Evaluation: $bestMoveEvaluation");
+    print("Best Move Black: $bestMoveBlack");
     print("User Move Evaluation: $userMoveEvaluation");
+
   }
 
   void makeMoveString() {}
@@ -250,8 +248,12 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
       makeMoveFromIndex(i);
     }
   }
+
   Future<List<Object>> evalResult(String fen, int depth) async {
-    _stockfish.stdin = 'eval $fen\n';
+
+    // evaluate this position
+
+    _stockfish.stdin = 'position fen $fen\n';
     _stockfish.stdin = 'go depth $depth\n';
     final completer = Completer<List<Object>>();
     var buffer = StringBuffer();
@@ -267,15 +269,18 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
         int spaceIndex = cpString.indexOf(" ");
         int cp = int.parse(cpString.substring(0, spaceIndex));
 
-        final score = cp;
+        final score = cp * -1; //flipped because we're looking at the user perspective
 
         subscription?.cancel();
         completer.complete([bestMove, score]);
       }
     });
 
+
+
+
     _stockfish.stdin = 'position fen $fen';
-    _stockfish.stdin  = 'go depth $depth';
+    _stockfish.stdin = 'go depth $depth';
 
     return completer.future;
   }
@@ -296,9 +301,8 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     return cp;
   }
 
-
-  Future<List<Object>> getBestMoveAndEvaluation(String fen) async {
-    final evalResulted = await evalResult(fen, 15);
+  Future<List<Object>> getBestMoveAndEvaluation(String fen, int depth) async {
+    final evalResulted = await evalResult(fen, depth);
     final bestMove = evalResulted[0] as String;
     final evaluation = evalResulted[1] as int;
 
@@ -312,17 +316,20 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     final fen = _controller.getFen();
 
     // prep stockfish
+    // prep stockfish
     _stockfish.stdin = 'isready \n';
     _stockfish.stdin = 'go movetime 3000 \n';
     _stockfish.stdin = 'go infinite \n';
+    _stockfish.stdin = 'uci\n';
     _stockfish.stdin = 'stop \n';
 
-    // give it position
-    _stockfish.stdin = 'position fen $fen\n';
-    _stockfish.stdin = 'go depth 15\n';
 
-    // eval
-    _stockfish.stdin = 'eval \n';
+    // // give it position
+    // _stockfish.stdin = 'position fen $fen\n';
+    // _stockfish.stdin = 'go depth 15\n';
+    //
+    // // eval
+    // _stockfish.stdin = 'eval \n';
   }
 
 /*
@@ -438,7 +445,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text(
-                    "Best Move: $_bestMove",
+                    "Best Move Opponent: $_bestMoveBlack",
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -456,7 +463,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
                   setState(() {
                     makeMoveFromIndex(_currentMoveIndex);
                     // maybe not perfect, but this will get stockfish going
-                    _prepStockfish();
+                     _prepStockfish();
                     _currentMoveIndex++;
                   });
                 },
