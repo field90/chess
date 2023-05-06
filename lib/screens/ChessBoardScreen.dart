@@ -84,10 +84,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
 
   void _initStockFish() async {
     _stockfish = await stockfishAsync();
-
-    // for debugging purposes only now
-    /*
-    _stockfish.stdout.listen((line) {
+/*    _stockfish.stdout.listen((line) {
       print("StockFish output: $line");
       final pattern = RegExp(r'^Final evaluation\s+(\S+)\s+\(white side\)');
       final match = pattern.firstMatch(line);
@@ -97,8 +94,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
           _eval = 'Evaluation: $score';
         });
       }
-    });
-    */
+    });*/
   }
 
   String getMoveFromPGN(int moveIndex, String color) {
@@ -123,9 +119,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     // Print the last move notation
     print(lastMoveNotation);
 
-    // request the evaluation here
-    final userEvaluationFuture = getBestMoveAndEvaluation(_fenWithYourMove!, 15);
-
     // wait for 1 second
     await Future.delayed(const Duration(seconds: 1));
 
@@ -147,10 +140,20 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     makeMoveFromIndex(_currentMoveIndex);
     _currentMoveIndex++;
     _currentTurnIndex++;
+    // _prepStockfish();
 
+    // Wait for both futures to complete concurrently
     // ok request the evaluation here
+    final userEvaluationFuture =
+        getBestMoveAndEvaluation(_fenWithYourMove!, 15);
     final results = await userEvaluationFuture;
 
+    // final results = await userEvaluationFuture;
+
+    // Extract the results of the two tasks
+    // Extract the results of the two tasks
+    // final bestMove = (results[0] as List<dynamic>)[0];
+    // final bestMoveEvaluation = (results[0] as List<dynamic>)[1];
     final bestMoveBlack = results[0];
     final userMoveEvaluation = results[1];
 
@@ -162,7 +165,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     // Do something with the results, e.g. print them
     print("Best Move Black: $bestMoveBlack");
     print("User Move Evaluation: $userMoveEvaluation");
-
   }
 
   void makeMoveString() {}
@@ -176,7 +178,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   }
 
   Future<List<Object>> evalResult(String fen, int depth) async {
-
     // evaluate this position
 
     _stockfish.stdin = 'position fen $fen\n';
@@ -195,7 +196,8 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
         int spaceIndex = cpString.indexOf(" ");
         int cp = int.parse(cpString.substring(0, spaceIndex));
 
-        final score = cp * -1; //flipped because we're looking at the user perspective
+        final score =
+            cp * -1; //flipped because we're looking at the user perspective
 
         subscription?.cancel();
         completer.complete([bestMove, score]);
@@ -206,6 +208,22 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     _stockfish.stdin = 'go depth $depth';
 
     return completer.future;
+  }
+
+  String extractBestMove(String output) {
+    final index = output.indexOf('bestmove') + 9;
+    final endIndex = output.indexOf(' ', index);
+    final bestMove = output.substring(index, endIndex);
+    return bestMove;
+  }
+
+  int extractEvaluation(String output) {
+    final scoreLine = output.trim().split('\n').last;
+    final cpIndex = scoreLine.indexOf('score cp');
+    final cpString = scoreLine.substring(cpIndex + 8).trimLeft();
+    final spaceIndex = cpString.indexOf(' ');
+    final cp = int.parse(cpString.substring(0, spaceIndex));
+    return cp;
   }
 
   Future<List<Object>> getBestMoveAndEvaluation(String fen, int depth) async {
@@ -229,7 +247,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     _stockfish.stdin = 'go infinite \n';
     _stockfish.stdin = 'uci\n';
     _stockfish.stdin = 'stop \n';
-
 
     // // give it position
     // _stockfish.stdin = 'position fen $fen\n';
@@ -370,7 +387,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
                   setState(() {
                     makeMoveFromIndex(_currentMoveIndex);
                     // maybe not perfect, but this will get stockfish going
-                     _prepStockfish();
+                    _prepStockfish();
                     _currentMoveIndex++;
                   });
                 },
