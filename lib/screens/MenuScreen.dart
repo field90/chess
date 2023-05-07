@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:michael_chess/MoveInfo.dart';
 import 'package:michael_chess/screens/ChessBoardScreen.dart';
 
 import 'package:flutter/services.dart' show rootBundle;
@@ -7,10 +8,10 @@ import 'package:yaml/yaml.dart';
 class Game {
   final String title;
   final String pgn;
+  final List<MoveInfo> bestMoves; // Add this property
 
-  Game({required this.title, required this.pgn});
+  Game({required this.title, required this.pgn, required this.bestMoves}); // Update the constructor
 }
-
 Future<Map<String, List<Game>>> loadGames() async {
   final Map<String, List<Game>> gameCategories = {};
 
@@ -23,12 +24,25 @@ Future<Map<String, List<Game>>> loadGames() async {
       final List<Game> games = [];
 
       for (final gameData in gamesList) {
+        final List<dynamic>? bestMovesList = gameData['bestMoves'] as List<dynamic>?;
+
+
+        final List<MoveInfo> bestMoves = (bestMovesList != null && bestMovesList.isNotEmpty)
+            ? bestMovesList.map((move) {
+          final YamlMap moveMap = move as YamlMap;
+          final String moveString = moveMap['move'] as String;
+          final String bestMoveString = moveMap['bestMove'] as String;
+          final int evaluation = moveMap['evaluation'] as int;
+          return MoveInfo(moveString, bestMoveString, evaluation);
+        }).toList()
+            : [];
+
         games.add(Game(
           title: gameData['title'],
           pgn: gameData['pgn'],
+          bestMoves: bestMoves, // Pass the bestMoves to the Game object
         ));
       }
-
       gameCategories[category] = games;
     }
   } catch (e) {
@@ -57,7 +71,7 @@ class CategoryScreen extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ChessBoardScreen(titleString: game.title, pgnString: game.pgn),
+                builder: (context) => ChessBoardScreen(titleString: game.title, pgnString: game.pgn, bestMoves: game.bestMoves,),
               ),
             );
           },

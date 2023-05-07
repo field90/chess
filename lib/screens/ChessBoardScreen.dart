@@ -3,15 +3,18 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart';
 import 'package:stockfish/stockfish.dart';
+import 'package:yaml/yaml.dart';
 
 import '../MoveInfo.dart';
 
 class ChessBoardScreen extends StatefulWidget {
   final String titleString;
   final String pgnString;
+  final List<MoveInfo> bestMoves;
+
 
   const ChessBoardScreen(
-      {super.key, required this.titleString, required this.pgnString});
+      {super.key, required this.titleString, required this.pgnString,   required this.bestMoves, });
 
   @override
   _ChessBoardScreenState createState() => _ChessBoardScreenState();
@@ -32,6 +35,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   String bestMoveNotation = "";
 
   String titleString = "";
+  late final List<MoveInfo> bestMoves;
 
   late Future<List<Object>> masterTuple;
 
@@ -39,8 +43,11 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
 
   // Define two state variables to hold the evaluations
   int? _bestMoveEvaluation;
+  int? _bestMoveBlackEvaluation;
   int? _userMoveEvaluation;
+  String? _bestMoveWhite;
   String? _bestMoveBlack;
+  String? _bestMoveBlackForUserMove;
 
   String? _fenWithYourMove;
 
@@ -48,6 +55,9 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   void initState() {
     super.initState();
     final pgnString = widget.pgnString;
+
+    bestMoves = widget.bestMoves;
+
     titleString = widget.titleString;
     final moveText = pgnString.replaceAll(RegExp(r'\[.*\]\s*'), '');
 
@@ -127,7 +137,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
           makeMoveFromIndex(moveIndex);
           moveIndex++;
         } catch (e) {
-          print("THE END: ");
           String stringMoveInfo = moveInfoList.toString();
           print(stringMoveInfo);
         }
@@ -171,7 +180,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
       }
     });*/
     //do this when necessary to get the computer moves
-    _precomputeMoves();
+    // _precomputeMoves();
   }
 
   String getMoveFromPGN(int moveIndex, String color) {
@@ -205,6 +214,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     masterMoveNotation = getMoveFromPGN(_currentTurnIndex, 'white');
     opponentMoveNotation = getMoveFromPGN(_currentTurnIndex, 'black');
 
+
     // master move
     makeMoveFromIndex(_currentMoveIndex);
     _currentMoveIndex++;
@@ -229,8 +239,13 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
 
     // Update the state of your widget with the new evaluation results
     setState(() {
-      _bestMoveBlack = bestMoveBlack as String?;
+      _bestMoveBlackForUserMove = bestMoveBlack as String?;
       _userMoveEvaluation = userMoveEvaluation as int?;
+      // set the best moves
+      _bestMoveWhite = bestMoves[_currentMoveIndex - 2].bestMove;
+      _bestMoveEvaluation = bestMoves[_currentMoveIndex -2 ].evaluation;
+      _bestMoveBlack = bestMoves[_currentMoveIndex - 1].bestMove;
+      _bestMoveBlackEvaluation = bestMoves[_currentMoveIndex - 1].evaluation;
     });
     // Do something with the results, e.g. print them
     print("Best Move Black: $bestMoveBlack");
@@ -293,7 +308,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   }
 
   void _prepStockfish() {
-    // prep stockfish
     // prep stockfish
     _stockfish.stdin = 'isready \n';
     _stockfish.stdin = 'go movetime 3000 \n';
@@ -415,7 +429,31 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text(
-                    "Best Move Opponent: $_bestMoveBlack",
+                    "Best Move White: $_bestMoveWhite",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    "Best Move Black: $_bestMoveBlack",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    "Best Response (YM): $_bestMoveBlackForUserMove",
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
