@@ -9,6 +9,169 @@ Classical Games:
       [Result "1-0"]
 
       1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4 Bxb4 5.c3 Ba5 6.d4 exd4 7.O-O dxc3 8.Qb3 Qf6 9.e5 Qg6 10.Nxc3 Nge7 11.Ba3 O-O 12.Rad1 Bxc3 13.Qxc3 Re8 14.Rfe1 Nd8 15.Nh4 Qh5 16.g3 Ne6 17.f4 Nf5 18.Be2 Qxh4 19.gxh4 Nxf4 20.Bg4 Nxh4 21.Qg3 Nfg6 22.Bh5 b6 23.Bxg6 Nxg6 24.h4 h5 25.Qg5 Bb7 26.Rxd7 Bf3 27.e6 1-0
+    bestMoves:
+        - move: "1.e4"
+          bestMove: "1.e2e4"
+          evaluation: 30
+        - move: "..1.e5"
+          bestMove: "..1.c7c5"
+          evaluation: 43
+        - move: "2.Nf3"
+          bestMove: "2.g1f3"
+          evaluation: 42
+        - move: "..2.Nc6"
+          bestMove: "..2.b8c6"
+          evaluation: 51
+        - move: "3.Bc4"
+          bestMove: "3.f1b5"
+          evaluation: 37
+        - move: "..3.Bc5"
+          bestMove: "..3.f8c5"
+          evaluation: 27
+        - move: "4.b4"
+          bestMove: "4.c2c3"
+          evaluation: 23
+        - move: "..4.Bxb4"
+          bestMove: "..4.c5b4"
+          evaluation: -60
+        - move: "5.c3"
+          bestMove: "5.c2c3"
+          evaluation: -18
+        - move: "..5.Ba5"
+          bestMove: "..5.b4a5"
+          evaluation: -14
+        - move: "6.d4"
+          bestMove: "6.d2d4"
+          evaluation: 0
+        - move: "..6.exd4"
+          bestMove: "..6.e5d4"
+          evaluation: 19
+        - move: "7.O-O"
+          bestMove: "7.e1g1"
+          evaluation: 0
+        - move: "..7.dxc3"
+          bestMove: "..7.g8e7"
+          evaluation: 27
+        - move: "8.Qb3"
+          bestMove: "8.d1b3"
+          evaluation: 5
+        - move: "..8.Qf6"
+          bestMove: "..8.d8f6"
+          evaluation: 54
+        - move: "9.e5"
+          bestMove: "9.e4e5"
+          evaluation: 44
+        - move: "..9.Qg6"
+          bestMove: "..9.f6f5"
+          evaluation: 81
+        - move: "10.Nxc3"
+          bestMove: "10.b1c3"
+          evaluation: 74
+        - move: "..10.Nge7"
+          bestMove: "..10.g8e7"
+          evaluation: 107
+        - move: "11.Ba3"
+          bestMove: "11.c1a3"
+          evaluation: 84
+        - move: "..11.O-O"
+          bestMove: "..11.b7b5"
+          evaluation: 27
+        - move: "12.Rad1"
+          bestMove: "12.a1d1"
+          evaluation: 40
+        - move: "..12.Bxc3"
+          bestMove: "..12.a5b6"
+          evaluation: 43
+        - move: "13.Qxc3"
+          bestMove: "13.b3c3"
+          evaluation: 43
+        - move: "..13.Re8"
+          bestMove: "..13.a7a5"
+          evaluation: 111
+        - move: "14.Rfe1"
+          bestMove: "14.f1e1"
+          evaluation: 145
+        - move: "..14.Nd8"
+          bestMove: "..14.c6d8"
+          evaluation: 185
+        - move: "15.Nh4"
+          bestMove: "15.f3d4"
+          evaluation: 217
+        - move: "..15.Qh5"
+          bestMove: "..15.g6g5"
+          evaluation: 142
+        - move: "16.g3"
+          bestMove: "16.g2g3"
+          evaluation: 171
+        - move: "..16.Ne6"
+          bestMove: "..16.d8e6"
+          evaluation: 182
+        - move: "17.f4"
+          bestMove: "17.c4e2"
+          evaluation: 164
+        - move: "..17.Nf5"
+          bestMove: "..17.e6f4"
+          evaluation: 99
+        - move: "18.Be2"
+          bestMove: "18.c4e2"
+          evaluation: 622
+        - move: "..18.Qxh4"
+          bestMove: "..18.h5h4"
+          evaluation: 856
+        - move: "19.gxh4"
+          bestMove: "19.g3h4"
+          evaluation: 855
+        - move: "..19.Nxf4"
+          bestMove: "..19.e6f4"
+          evaluation: 868
+        - move: "20.Bg4"
+          bestMove: "20.e2c4"
+          evaluation: 900
+        - move: "..20.Nxh4"
+          bestMove: "..20.f5h4"
+          evaluation: 868
+        - move: "21.Qg3"
+          bestMove: "21.a3b2"
+          evaluation: 831
+        - move: "..21.Nfg6"
+          bestMove: "..21.h4g6"
+          evaluation: 566
+        - move: "22.Bh5"
+          bestMove: "22.g4h5"
+          evaluation: 798
+        - move: "..22.b6"
+          bestMove: "..22.b7b6"
+          evaluation: 866
+        - move: "23.Bxg6"
+          bestMove: "23.g3f2"
+          evaluation: 839
+        - move: "..23.Nxg6"
+          bestMove: "..23.h4g6"
+          evaluation: 837
+        - move: "24.h4"
+          bestMove: "24.e1e3"
+          evaluation: 718
+        - move: "..24.h5"
+          bestMove: "..24.h7h5"
+          evaluation: 746
+        - move: "25.Qg5"
+          bestMove: "25.g3f3"
+          evaluation: 741
+        - move: "..25.Bb7"
+          bestMove: "..25.e8e6"
+          evaluation: 741
+        - move: "26.Rxd7"
+          bestMove: "26.d1d7"
+          evaluation: 750
+        - move: "..26.Bf3"
+          bestMove: "..26.b7c8"
+          evaluation: 738
+        - move: "27.e6"
+          bestMove: "27.e5e6"
+          evaluation: 933
+        - move: "..27.1-0"
+          bestMove: "..27.f3d5"
+          evaluation: 1055
 
   - title: "Paul Morphy vs. Duke Karl / Count Isouard, Paris Opera 1858"
     pgn: |

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart';
 import 'package:stockfish/stockfish.dart';
 
+import '../MoveInfo.dart';
+
 class ChessBoardScreen extends StatefulWidget {
   final String titleString;
   final String pgnString;
@@ -65,6 +67,80 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
 
     _initStockFish();
     // start the process of calcuating the next move.
+    // _precomputeMoves();
+  }
+
+  void _precomputeMoves() async {
+    List<MoveInfo> moveInfoList = [];
+
+    int moveIndex = 0;
+    int turnNumber = 0;
+
+    // Best move
+    for (int i = 0; i < moves.length; i++) {
+      turnNumber = i + 1;
+
+      masterMoveNotation = getMoveFromPGN(i, 'white');
+      opponentMoveNotation = getMoveFromPGN(i, 'black');
+
+      String fen = _controller.getFen();
+      const depth = 15;
+      final bestMoveWhiteTuple = await evalResult(fen, depth, false);
+
+      final bestMoveWhite = bestMoveWhiteTuple[0] as String;
+      final evaluationWhite = bestMoveWhiteTuple[1] as int;
+
+      MoveInfo moveInfoWhite = MoveInfo(
+        '$turnNumber.$masterMoveNotation',
+        '$turnNumber.$bestMoveWhite',
+        evaluationWhite,
+      );
+      moveInfoList.add(moveInfoWhite);
+
+      print("Move: ${moveInfoWhite.move}");
+      print("Best Move: ${moveInfoWhite.bestMove}");
+      print("Evaluation: ${moveInfoWhite.evaluation}");
+
+      // move white
+      makeMoveFromIndex(moveIndex);
+      moveIndex++;
+
+      //now evaluate black
+      //updated fen
+      fen = _controller.getFen();
+      final bestMoveBlackTuple = await evalResult(fen, depth, true);
+
+      final bestMoveBlack = bestMoveBlackTuple[0] as String;
+      final evaluationBlack = bestMoveBlackTuple[1] as int;
+      MoveInfo moveInfoBlack = MoveInfo(
+        '..$turnNumber.$opponentMoveNotation',
+        '..$turnNumber.$bestMoveBlack',
+        evaluationBlack,
+      );
+      print("Move: ${moveInfoBlack.move}");
+      print("Best Move: ${moveInfoBlack.bestMove}");
+      print("Evaluation: ${moveInfoBlack.evaluation}");
+      moveInfoList.add(moveInfoBlack);
+      if (turnNumber != moves.length) {
+        // move black
+        try {
+          makeMoveFromIndex(moveIndex);
+          moveIndex++;
+        } catch (e) {
+          print("THE END: ");
+          String stringMoveInfo = moveInfoList.toString();
+          print(stringMoveInfo);
+        }
+      }
+      print("STATE OF THE LIST");
+      String stringMoveInfo = moveInfoList.toString();
+      print(stringMoveInfo);
+
+      // Store the results in a data structure or file
+      // ...
+    }
+    String stringMoveInfo = moveInfoList.toString();
+    print(stringMoveInfo);
   }
 
   makeMoveFromIndex(int i) {
@@ -94,6 +170,8 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
         });
       }
     });*/
+    //do this when necessary to get the computer moves
+    _precomputeMoves();
   }
 
   String getMoveFromPGN(int moveIndex, String color) {
@@ -124,7 +202,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     resetBoardWithoutLastMove();
     // Get the cp after the move was played.
 
-    // wait for 1 second
     masterMoveNotation = getMoveFromPGN(_currentTurnIndex, 'white');
     opponentMoveNotation = getMoveFromPGN(_currentTurnIndex, 'black');
 
@@ -170,7 +247,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     }
   }
 
-  Future<List<Object>> evalResult(String fen, int depth) async {
+  Future<List<Object>> evalResult(String fen, int depth, bool flip) async {
     // evaluate this position
 
     _stockfish.stdin = 'position fen $fen\n';
@@ -188,9 +265,14 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
         String cpString = scoreLine.substring(cpIndex + 8).trimLeft();
         int spaceIndex = cpString.indexOf(" ");
         int cp = int.parse(cpString.substring(0, spaceIndex));
+        int score;
 
-        final score =
-            cp * -1; //flipped because we're looking at the user perspective
+        if (flip) {
+          score =
+              cp * -1; //flipped because we're looking at the user perspective
+        } else {
+          score = cp;
+        }
 
         subscription?.cancel();
         completer.complete([bestMove, score]);
@@ -200,7 +282,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   }
 
   Future<List<Object>> getBestMoveAndEvaluation(String fen, int depth) async {
-    final evalResulted = await evalResult(fen, depth);
+    final evalResulted = await evalResult(fen, depth, true);
     final bestMove = evalResulted[0] as String;
     final evaluation = evalResulted[1] as int;
 
@@ -211,7 +293,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   }
 
   void _prepStockfish() {
-
     // prep stockfish
     // prep stockfish
     _stockfish.stdin = 'isready \n';
@@ -219,7 +300,6 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     _stockfish.stdin = 'go infinite \n';
     _stockfish.stdin = 'uci\n';
     _stockfish.stdin = 'stop \n';
-
   }
 
 /*
