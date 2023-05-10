@@ -3,9 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart';
 import 'package:stockfish/stockfish.dart';
-import 'package:yaml/yaml.dart';
-
 import '../MoveInfo.dart';
+import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 
 class ChessBoardScreen extends StatefulWidget {
   final String titleString;
@@ -50,10 +49,13 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
   String? _bestMoveBlackForUserMove;
 
   String? _fenWithYourMove;
+  ProgressDialog? _progressDialog;
 
   @override
   void initState() {
     super.initState();
+    _progressDialog = ProgressDialog(context: context);
+
     final pgnString = widget.pgnString;
 
     bestMoves = widget.bestMoves;
@@ -226,10 +228,10 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
     makeMoveFromIndex(_currentMoveIndex);
     _currentMoveIndex++;
     _currentTurnIndex++;
-    // _prepStockfish();
 
     // Wait for both futures to complete concurrently
     // ok request the evaluation here
+    _progressDialog?.show(max: 100, msg: 'Loading Move...');
     final userEvaluationFuture =
         getBestMoveAndEvaluation(_fenWithYourMove!, 15);
     final results = await userEvaluationFuture;
@@ -239,6 +241,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
 
     // Update the state of your widget with the new evaluation results
     setState(() {
+      _progressDialog?.close();
       _bestMoveBlackForUserMove = bestMoveBlack as String?;
       _userMoveEvaluation = userMoveEvaluation as int?;
       // set the best moves
@@ -339,6 +342,7 @@ class _ChessBoardScreenState extends State<ChessBoardScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('MichaelChess'),
