@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
-class LoadingDialog extends StatelessWidget {
+import '../Quote.dart';
+import '../services/QuoteService.dart';
+
+class LoadingDialog extends StatefulWidget {
   final String message;
   final Color backgroundColor;
   final Color textColor;
@@ -13,24 +16,27 @@ class LoadingDialog extends StatelessWidget {
     this.radius = 10.0,
   });
 
-  late BuildContext _dialogContext;
-
   void show(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        _dialogContext = context;
-        return _buildDialog();
-      },
-    );
+    _initializeQuote().then((quote) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return _buildDialog(context, quote);
+        },
+      );
+    });
+  }
+  Future<Quote> _initializeQuote() async {
+    Quote q = await QuoteService.getRandomQuote();
+    return q;
   }
 
-  void hide() {
-    Navigator.of(_dialogContext).pop();
+  void hide(BuildContext context) {
+    Navigator.of(context).pop();
   }
 
-  Widget _buildDialog() {
+  Widget _buildDialog(BuildContext context, Quote quote) {
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -53,12 +59,35 @@ class LoadingDialog extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
+            SizedBox(height: 16.0),
+            Text(
+              quote.quote,
+              style: TextStyle(
+                color: textColor,
+                fontSize: 16.0,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            SizedBox(height: 8.0),
+            Text(
+              "-${quote.author}",
+              style: TextStyle(
+                color: textColor,
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
+  @override
+  _LoadingDialogState createState() => _LoadingDialogState();
+}
+
+class _LoadingDialogState extends State<LoadingDialog> {
   @override
   Widget build(BuildContext context) {
     return Container();

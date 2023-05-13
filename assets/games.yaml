@@ -385,6 +385,230 @@ Spassky Fischer:
       a5 26. e4 Ba1 27. f4 f6 28. Re2 Ke6 29. Rec2 Bb2 30. Be2 h5
       31. Rd2 Ba3 32. f5+ gxf5 33. exf5+ Ke5 34. Rcd4 Kxf5 35. Rd5+
       Ke6 36. Rxd6+ Ke7 37. Rc6 1-0
+    bestMoves:
+        - move: "1.c4"
+          bestMove: "1.e2e4"
+          evaluation: 30
+        - move: "..1.c5"
+          bestMove: "..1.e7e5"
+          evaluation: 32
+        - move: "2.Nc3"
+          bestMove: "2.g1f3"
+          evaluation: 21
+        - move: "..2.Nc6"
+          bestMove: "..2.g7g6"
+          evaluation: 35
+        - move: "3.Nf3"
+          bestMove: "3.g1f3"
+          evaluation: 44
+        - move: "..3.Nf6"
+          bestMove: "..3.g8f6"
+          evaluation: 49
+        - move: "4.g3"
+          bestMove: "4.d2d4"
+          evaluation: 30
+        - move: "..4.g6"
+          bestMove: "..4.g7g6"
+          evaluation: 29
+        - move: "5.Bg2"
+          bestMove: "5.d2d4"
+          evaluation: 32
+        - move: "..5.Bg7"
+          bestMove: "..5.d7d6"
+          evaluation: 29
+        - move: "6.O-O"
+          bestMove: "6.d2d4"
+          evaluation: 55
+        - move: "..6.O-O"
+          bestMove: "..6.e8g8"
+          evaluation: 38
+        - move: "7.d4"
+          bestMove: "7.d2d4"
+          evaluation: 23
+        - move: "..7.cxd4"
+          bestMove: "..7.c5d4"
+          evaluation: 72
+        - move: "8.Nxd4"
+          bestMove: "8.f3d4"
+          evaluation: 50
+        - move: "..8.Nxd4"
+          bestMove: "..8.c6d4"
+          evaluation: 53
+        - move: "9.Qxd4"
+          bestMove: "9.d1d4"
+          evaluation: 50
+        - move: "..9.d6"
+          bestMove: "..9.d7d6"
+          evaluation: 50
+        - move: "10.Bg5"
+          bestMove: "10.d4d3"
+          evaluation: 37
+        - move: "..10.Be6"
+          bestMove: "..10.h7h6"
+          evaluation: 13
+        - move: "11.Qf4"
+          bestMove: "11.d4d3"
+          evaluation: 55
+        - move: "..11.Qa5"
+          bestMove: "..11.f6g4"
+          evaluation: 0
+        - move: "12.Rac1"
+          bestMove: "12.a1c1"
+          evaluation: 9
+        - move: "..12.Rab8"
+          bestMove: "..12.a8b8"
+          evaluation: 41
+        - move: "13.b3"
+          bestMove: "13.b2b3"
+          evaluation: 33
+        - move: "..13.Rfc8"
+          bestMove: "..13.f8c8"
+          evaluation: 34
+        - move: "14.Qd2"
+          bestMove: "14.f4d2"
+          evaluation: 36
+        - move: "..14.a6"
+          bestMove: "..14.a7a6"
+          evaluation: 73
+        - move: "15.Be3"
+          bestMove: "15.a2a4"
+          evaluation: 25
+        - move: "..15.b5"
+          bestMove: "..15.f6g4"
+          evaluation: 40
+        - move: "16.Ba7"
+          bestMove: "16.e3a7"
+          evaluation: 33
+        - move: "..16.bxc4"
+          bestMove: "..16.b5c4"
+          evaluation: 173
+        - move: "17.Bxb8"
+          bestMove: "17.a7b8"
+          evaluation: 160
+        - move: "..17.Rxb8"
+          bestMove: "..17.c8b8"
+          evaluation: 150
+        - move: "18.bxc4"
+          bestMove: "18.b3c4"
+          evaluation: 163
+        - move: "..18.Bxc4"
+          bestMove: "..18.b8c8"
+          evaluation: 163
+        - move: "19.Rfd1"
+          bestMove: "19.f1d1"
+          evaluation: 174
+        - move: "..19.Nd7"
+          bestMove: "..19.a5e5"
+          evaluation: 186
+        - move: "20.Nd5"
+          bestMove: "20.c3d5"
+          evaluation: 185
+        - move: "..20.Qxd2"
+          bestMove: "..20.a5d2"
+          evaluation: 450
+        - move: "21.Nxe7+"
+          bestMove: "21.d5e7"
+          evaluation: 475
+        - move: "..21.Kf8"
+          bestMove: "..21.g8f8"
+          evaluation: 491
+        - move: "22.Rxd2"
+          bestMove: "22.d1d2"
+          evaluation: 472
+        - move: "..22.Kxe7"
+          bestMove: "..22.f8e7"
+          evaluation: 528
+        - move: "23.Rxc4"
+          bestMove: "23.c1c4"
+          evaluation: 422
+        - move: "..23.Rb1+"
+          bestMove: "..23.b8b1"
+          evaluation: 477
+        - move: "24.Bf1"
+          bestMove: "24.g2f1"
+          evaluation: 422
+        - move: "..24.Nc5"
+          bestMove: "..24.d7c5"
+          evaluation: 396
+        - move: "25.Kg2"
+          bestMove: "25.g1g2"
+          evaluation: 432
+        - move: "..25.a5"
+          bestMove: "..25.f7f5"
+          evaluation: 427
+        - move: "26.e4"
+          bestMove: "26.e2e4"
+          evaluation: 446
+        - move: "..26.Ba1"
+          bestMove: "..26.h7h5"
+          evaluation: 503
+        - move: "27.f4"
+          bestMove: "27.f1d3"
+          evaluation: 503
+        - move: "..27.f6"
+          bestMove: "..27.f7f6"
+          evaluation: 467
+        - move: "28.Re2"
+          bestMove: "28.f1d3"
+          evaluation: 482
+        - move: "..28.Ke6"
+          bestMove: "..28.a5a4"
+          evaluation: 258
+        - move: "29.Rec2"
+          bestMove: "29.e2d2"
+          evaluation: 521
+        - move: "..29.Bb2"
+          bestMove: "..29.b1b6"
+          evaluation: 404
+        - move: "30.Be2"
+          bestMove: "30.c2d2"
+          evaluation: 449
+        - move: "..30.h5"
+          bestMove: "..30.a5a4"
+          evaluation: 436
+        - move: "31.Rd2"
+          bestMove: "31.c2d2"
+          evaluation: 502
+        - move: "..31.Ba3"
+          bestMove: "..31.a5a4"
+          evaluation: 573
+        - move: "32.f5+"
+          bestMove: "32.f4f5"
+          evaluation: 594
+        - move: "..32.gxf5"
+          bestMove: "..32.g6f5"
+          evaluation: 628
+        - move: "33.exf5+"
+          bestMove: "33.e4f5"
+          evaluation: 644
+        - move: "..33.Ke5"
+          bestMove: "..33.e6e7"
+          evaluation: 663
+        - move: "34.Rcd4"
+          bestMove: "34.c4d4"
+          evaluation: 662
+        - move: "..34.Kxf5"
+          bestMove: "..34.b1b2"
+          evaluation: 664
+        - move: "35.Rd5+"
+          bestMove: "35.d4d5"
+          evaluation: 703
+        - move: "..35.Ke6"
+          bestMove: "..35.f5e6"
+          evaluation: 713
+        - move: "36.Rxd6+"
+          bestMove: "36.d5d6"
+          evaluation: 722
+        - move: "..36.Ke7"
+          bestMove: "..36.e6e7"
+          evaluation: 708
+        - move: "37.Rc6"
+          bestMove: "37.d6c6"
+          evaluation: 722
+        - move: "..37.1-0"
+          bestMove: "..37.f6f5"
+          evaluation: 735
+
   - title: "Spassky Fischer game 9"
     pgn: |
       [Event "Spassky - Fischer World Championship Match"]
@@ -454,6 +678,194 @@ Spassky Fischer:
       17. c4 Nf5 18. Qd3 h4 19. Bg4 Nd6 20. N1d2 f5 21. a3 Qb6
       22. c5 Qb5 23. Qc3 fxg4 24. a4 h3 25. axb5 hxg2+ 26. Kxg2 Rh3
       27. Qf6 Nf5 28. c6 Bc8 29. dxe6 fxe6 30. Rfe1 Be7 31. Rxe6 1-0
+    bestMoves:
+        - move: "1.e4"
+          bestMove: "1.e2e4"
+          evaluation: 30
+        - move: "..1.c5"
+          bestMove: "..1.c7c5"
+          evaluation: 43
+        - move: "2.Nf3"
+          bestMove: "2.g1f3"
+          evaluation: 31
+        - move: "..2.d6"
+          bestMove: "..2.d7d6"
+          evaluation: 36
+        - move: "3.d4"
+          bestMove: "3.f1b5"
+          evaluation: 22
+        - move: "..3.cxd4"
+          bestMove: "..3.g8f6"
+          evaluation: 28
+        - move: "4.Nxd4"
+          bestMove: "4.f3d4"
+          evaluation: 38
+        - move: "..4.Nf6"
+          bestMove: "..4.g8f6"
+          evaluation: 42
+        - move: "5.Nc3"
+          bestMove: "5.b1c3"
+          evaluation: 41
+        - move: "..5.a6"
+          bestMove: "..5.a7a6"
+          evaluation: 41
+        - move: "6.Bg5"
+          bestMove: "6.c1e3"
+          evaluation: 50
+        - move: "..6.e6"
+          bestMove: "..6.e7e6"
+          evaluation: 34
+        - move: "7.f4"
+          bestMove: "7.f2f4"
+          evaluation: 1
+        - move: "..7.Qb6"
+          bestMove: "..7.d8b6"
+          evaluation: 10
+        - move: "8.Qd2"
+          bestMove: "8.d1d2"
+          evaluation: 8
+        - move: "..8.Qxb2"
+          bestMove: "..8.b6b2"
+          evaluation: 9
+        - move: "9.Nb3"
+          bestMove: "9.a1b1"
+          evaluation: -6
+        - move: "..9.Qa3"
+          bestMove: "..9.b8d7"
+          evaluation: -27
+        - move: "10.Bxf6"
+          bestMove: "10.g5f6"
+          evaluation: -30
+        - move: "..10.gxf6"
+          bestMove: "..10.g7f6"
+          evaluation: -28
+        - move: "11.Be2"
+          bestMove: "11.f1e2"
+          evaluation: -31
+        - move: "..11.h5"
+          bestMove: "..11.h7h5"
+          evaluation: -17
+        - move: "12.O-O"
+          bestMove: "12.e1g1"
+          evaluation: -26
+        - move: "..12.Nc6"
+          bestMove: "..12.b8d7"
+          evaluation: -2
+        - move: "13.Kh1"
+          bestMove: "13.c3b1"
+          evaluation: 2
+        - move: "..13.Bd7"
+          bestMove: "..13.f8e7"
+          evaluation: -26
+        - move: "14.Nb1"
+          bestMove: "14.c3d1"
+          evaluation: 8
+        - move: "..14.Qb4"
+          bestMove: "..14.a3b4"
+          evaluation: -102
+        - move: "15.Qe3"
+          bestMove: "15.d2e3"
+          evaluation: -63
+        - move: "..15.d5"
+          bestMove: "..15.c6e7"
+          evaluation: -24
+        - move: "16.exd5"
+          bestMove: "16.e4d5"
+          evaluation: 33
+        - move: "..16.Ne7"
+          bestMove: "..16.c6e7"
+          evaluation: 12
+        - move: "17.c4"
+          bestMove: "17.c2c4"
+          evaluation: 74
+        - move: "..17.Nf5"
+          bestMove: "..17.e7f5"
+          evaluation: 76
+        - move: "18.Qd3"
+          bestMove: "18.e3d3"
+          evaluation: 72
+        - move: "..18.h4"
+          bestMove: "..18.b4b6"
+          evaluation: 82
+        - move: "19.Bg4"
+          bestMove: "19.e2g4"
+          evaluation: 77
+        - move: "..19.Nd6"
+          bestMove: "..19.e8c8"
+          evaluation: 128
+        - move: "20.N1d2"
+          bestMove: "20.b1d2"
+          evaluation: 116
+        - move: "..20.f5"
+          bestMove: "..20.a8c8"
+          evaluation: 292
+        - move: "21.a3"
+          bestMove: "21.a2a3"
+          evaluation: 251
+        - move: "..21.Qb6"
+          bestMove: "..21.b4b6"
+          evaluation: 389
+        - move: "22.c5"
+          bestMove: "22.c4c5"
+          evaluation: 394
+        - move: "..22.Qb5"
+          bestMove: "..22.b6d8"
+          evaluation: 446
+        - move: "23.Qc3"
+          bestMove: "23.d3c3"
+          evaluation: 382
+        - move: "..23.fxg4"
+          bestMove: "..23.h8g8"
+          evaluation: 469
+        - move: "24.a4"
+          bestMove: "24.a3a4"
+          evaluation: 597
+        - move: "..24.h3"
+          bestMove: "..24.b5f1"
+          evaluation: 645
+        - move: "25.axb5"
+          bestMove: "25.a4b5"
+          evaluation: 780
+        - move: "..25.hxg2+"
+          bestMove: "..25.h3g2"
+          evaluation: 800
+        - move: "26.Kxg2"
+          bestMove: "26.h1g2"
+          evaluation: 818
+        - move: "..26.Rh3"
+          bestMove: "..26.h8h3"
+          evaluation: 720
+        - move: "27.Qf6"
+          bestMove: "27.c3e5"
+          evaluation: 804
+        - move: "..27.Nf5"
+          bestMove: "..27.d6f5"
+          evaluation: 550
+        - move: "28.c6"
+          bestMove: "28.b5a6"
+          evaluation: 722
+        - move: "..28.Bc8"
+          bestMove: "..28.b7c6"
+          evaluation: 447
+        - move: "29.dxe6"
+          bestMove: "29.d5e6"
+          evaluation: 796
+        - move: "..29.fxe6"
+          bestMove: "..29.f7e6"
+          evaluation: 1060
+        - move: "30.Rfe1"
+          bestMove: "30.f1e1"
+          evaluation: 1041
+        - move: "..30.Be7"
+          bestMove: "..30.h3e3"
+          evaluation: 1104
+        - move: "31.Rxe6"
+          bestMove: "31.e1e6"
+          evaluation: 1110
+        - move: "..31.1-0"
+          bestMove: "..31.c8e6"
+          evaluation: 1265
+         
   - title: "Spassky Fischer game 12"
     pgn: |
       [Event "Spassky - Fischer World Championship Match"]
